@@ -136,6 +136,144 @@ public:
     }
 
     //eigenvalues
+    static Matrix<T> hessenberg(Matrix<T> &m) {
+
+    }
+    bool eigenvalues(size_t max_iter, double eps, double *res) {
+        size_t n = rows_num;
+        size_t iter_num;
+        Matrix<T> matrix_hessenberg = hessenberg(*this);
+        while (n != 0) {
+            size_t t = n - 1;
+            while (t > 0) {
+                T temp = abs(matrix_hessenberg.get(t - 1, t - 1));
+                temp = temp + abs(matrix_hessenberg.get(t, t));
+                temp = temp * eps;
+                if (abs(matrix_hessenberg.get(t, t - 1)) > temp) {
+                    t--;
+                } else {
+                    break;
+                }
+            }
+            if (t == n - 1) {
+                res[(n - 1) * 2] = matrix_hessenberg.get(n - 1, n - 1);
+                res[(n - 1) * 2 + 1] = 0;
+                n -= 1;
+                iter_num = max_iter;
+            } else if (t == n - 2) {
+                T b, c, d, y, xy;
+                b = -matrix_hessenberg.get(n - 1, n - 1) - matrix_hessenberg.get(n - 2, n - 2);
+                c = matrix_hessenberg.get(n - 1, n - 1) * matrix_hessenberg.get(n - 2, n - 2) - matrix_hessenberg.get(n - 1, n - 2) * matrix_hessenberg.get(n - 2, n - 1);
+                d = b * b - 4 * c;
+                y = sqrt(abs(d));
+                if (d > 0) {
+                    xy = 1;
+                    if (b < 0) {
+                        xy = -1;
+                    }
+                    res[(n - 1) * 2] = -(b + xy * y) / 2;
+                    res[(n - 1) * 2 + 1] = 0;
+                    res[(n - 2) * 2] = c / res[(n - 1) * 2];
+                    res[(n - 2) * 2 + 1] = 0;
+                } else {
+                    res[(n - 1) * 2] = -b / 2;
+                    res[(n - 2) * 2] = -b / 2;
+                    res[(n - 1) * 2 + 1] = y / 2;
+                    res[(n - 2) * 2 + 1] = -y / 2;
+                }
+                n -= 2;
+                iter_num = max_iter;
+            } else {
+                if (iter_num < 1) return false;
+                iter_num--;
+                size_t j = t + 2, k = t;
+                T p, q, r, b, c, x, y, xy, s, e, f, g, z;
+                while ( j < n) {
+                    matrix_hessenberg.set(j, j - 2, 0);
+                    j++;
+                }
+                j = t + 3;
+                while (j < n) {
+                    matrix_hessenberg.set(j, j - 3, 0);
+                    j++;
+                }
+                while ( k < n - 1) {
+                    if (k != t) {
+                        p = matrix_hessenberg.get(k, k - 1);
+                        q = matrix_hessenberg.get(k + 1, k - 1);
+                        if (k != n - 2) {
+                            r = matrix_hessenberg.get(k + 2, k - 1);
+                        } else {
+                            r = 0;
+                        }
+                    } else {
+                        b = matrix_hessenberg.get(n - 1, n - 1);
+                        c = matrix_hessenberg.get(n - 2, n - 2);
+                        x = b + c;
+                        y = b * c - matrix_hessenberg.get(n - 1, n - 2) * matrix_hessenberg.get(n - 2, n - 1);
+                        p = matrix_hessenberg.get(t, t) * (matrix_hessenberg.get(t, t) - x) + matrix_hessenberg.get(t, t + 1) * matrix_hessenberg.get(t + 1, t) + y;
+                        q = matrix_hessenberg.get(t + 1, t) * (matrix_hessenberg.get(t, t) + matrix_hessenberg.get(t + 1, t + 1) - x);
+                        r = matrix_hessenberg.get(t + 1, t) * matrix_hessenberg.get(t + 2, t + 1);
+                    }
+                    if (p != 0 || q != 0 || r != 0) {
+                        if (p<0) {
+                            xy = -1;
+                        } else {
+                            xy = 1;
+                        }
+                        s= xy * sqrt(p * p + q * q + r * r);
+                        if (k != t) {
+                            matrix_hessenberg.set(k, k - 1, -s);
+                        }
+                        e = -q / s;
+                        f = -r / s;
+                        x = -p / s;
+                        y = -x - f * r / (p + s);
+                        g = e * r / (p + s);
+                        z = -x - e * q / (p + s);
+                        for (j = k; j < n; j++) {
+                            b = matrix_hessenberg.get(k, j);
+                            c = matrix_hessenberg.get(k + 1, j);
+                            p = x * b + e * c;
+                            q = e * b + y * c;
+                            r = f * b + g * c;
+                            if (k != n - 2) {
+                                b = matrix_hessenberg.get(k + 2, j);
+                                p += f * b;
+                                q += g * b;
+                                r += z * b;
+                                matrix_hessenberg.set(k + 2, j, r);
+                            }
+                            matrix_hessenberg.set(k + 1, j, q);
+                            matrix_hessenberg.set(k, j, p);
+                        }
+                        j = k + 3;
+                        if (j > n - 2) {
+                            j = n - 1;
+                        }
+                        for (size_t i = t; i < j + 1; i++) {
+                            b = matrix_hessenberg.get(i, k);
+                            c = matrix_hessenberg.get(i, k + 1);
+                            p = x * b + e * c;
+                            q = e * b + y * c;
+                            r = f * b + g * c;
+                            if (k != n - 2) {
+                                b = matrix_hessenberg.get(i, k + 2);;
+                                p += f * b;
+                                q += g * b;
+                                r += z * b;
+                                matrix_hessenberg.set(i, k + 2, r);
+                            }
+                            matrix_hessenberg.set(i, k + 1, q);
+                            matrix_hessenberg.set(i, k, p);
+                        }
+                    }
+                    k++;
+                }
+            }
+        }
+        return true;
+    }
 
     //eigenvectors
 
