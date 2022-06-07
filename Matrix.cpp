@@ -405,7 +405,7 @@ Matrix<T> inverse(const Matrix<T> &m) {
 }
 
 template<class T>
-Matrix<T> conv(const Matrix<T>& m1, const Matrix<T>& m2, int mode){
+Matrix<T> conv(const Matrix<T>& m1, const Matrix<T>& m2){
     size_t rows = m1.rows_num + m2.rows_num - 1;
     size_t cols = m1.cols_num + m2.cols_num - 1;
     T* resData = new T[rows * cols];
