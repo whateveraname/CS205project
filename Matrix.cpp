@@ -1,8 +1,10 @@
-#include <cstddef>
+#include <iostream>
+#include <memory.h>
 
 /*naive version, no shared memory, all hard copy*/
 template <class T>
 class Matrix {
+public:
     size_t rows_num, cols_num;
     T* data;
 
@@ -136,7 +138,37 @@ class Matrix {
     T determinant() {
 
     }
+
+    Matrix<T> reshape(size_t row, size_t col){
+        return Matrix<T>(row, col, data);
+    }
+
+    Matrix<T> slice(size_t row_start, size_t row_end, size_t col_start, size_t col_end){    //start from 0, including start and end
+        size_t rows = row_end - row_start + 1;
+        size_t cols = col_end - col_start + 1;
+        T* d = new T[rows * cols];
+        for(size_t i = row_start; i <= row_end; i++){
+            memcpy(d + i * cols, data + i * cols_num + row_start, cols);
+        }
+        return Matrix<T>(rows, cols, d);  //sliced matrix
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, Matrix<T> m);
 };
+
+template<class T>
+std::ostream &operator<<(std::ostream &os, Matrix<T> m) {
+    os << "[";
+    for (size_t i = 0; i < m.rows_num; i++){
+        os << "[";
+        for (size_t j = 0; j < m.cols_num - 1; j++){
+            os << m.get(i, j) << ",\t";
+        }
+        os << m.get(i, m.cols_num - 1) << "]";
+    }
+    os << "]\n";
+    return os;
+}
 
 //matrix addition
 template <class T>
