@@ -1,7 +1,9 @@
+/*naive version, no shared memory, all hard copy*/
+#include <cstddef>
+#include <complex>
 #include <iostream>
 #include <memory.h>
 
-/*naive version, no shared memory, all hard copy*/
 template <class T>
 class Matrix {
 public:
@@ -9,6 +11,11 @@ public:
     T* data;
 
     //constructors
+    Matrix(size_t rows, size_t cols) {
+        rows_num = rows;
+        cols_num = cols;
+        data = new T[rows_num * cols_num];
+    }
     Matrix(size_t rows, size_t cols, T* d) {
         rows_num = rows;
         cols_num = cols;
@@ -173,69 +180,201 @@ std::ostream &operator<<(std::ostream &os, Matrix<T> m) {
 //matrix addition
 template <class T>
 Matrix<T> operator + (const Matrix<T> &m1, const Matrix<T> &m2) {
-
+    size_t row_n = m1.rows_num, col_n = m1.cols_num;
+    Matrix<T> res(row_n, col_n);
+    for (size_t i = 0; i < row_n; ++i) {
+        for (size_t j = 0; j < col_n; ++j) {
+            res.set(i, j, m1.get(i, j) + m2.get(i ,j));
+        }
+    }
+    return res;
 }
 
-//matrix substraction
+//matrix subtraction
 template <class T>
 Matrix<T> operator - (const Matrix<T> &m1, const Matrix<T> &m2) {
-
+    size_t row_n = m1.rows_num, col_n = m1.cols_num;
+    Matrix<T> res(row_n, col_n);
+    for (size_t i = 0; i < row_n; ++i) {
+        for (size_t j = 0; j < col_n; ++j) {
+            res.set(i, j, m1.get(i, j) - m2.get(i ,j));
+        }
+    }
+    return res;
 }
 
 //scalar multiplication
 template <class T>
 Matrix<T> operator * (const Matrix<T> &m1, T c) {
-
+    size_t row_n = m1.rows_num, col_n = m1.cols_num;
+    Matrix<T> res(row_n, col_n);
+    for (size_t i = 0; i < row_n; ++i) {
+        for (size_t j = 0; j < col_n; ++j) {
+            res.set(i, j, m1.get(i, j) * c);
+        }
+    }
+    return res;
 }
 template <class T>
 Matrix<T> operator * (T c, const Matrix<T> &m2) {
-
+    return m2 * c;
 }
 
 //matrix multiplication
 template <class T>
 Matrix<T> operator * (const Matrix<T> &m1, const Matrix<T> &m2) {
-
+    size_t size = m1.rows_num;
+    Matrix<T> res(size, size);
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = 0; j < size; ++j) {
+            T temp = 0;
+            for (size_t k = 0; k < size; ++k) {
+                temp = temp + m1.get(i, k) * m2.get(k, j);
+            }
+            res.set(i, j, temp);
+        }
+    }
+    return res;
 }
 
 //element-wise multiplication
 template <class T>
-Matrix<T> element_wise_multiplication(const Matrix<T> m1, const Matrix<T> m2) {
-
+Matrix<T> element_wise_multiplication(const Matrix<T> &m1, const Matrix<T> &m2) {
+    size_t row_n = m1.rows_num, col_n = m1.cols_num;
+    Matrix<T> res(row_n, col_n);
+    for (size_t i = 0; i < row_n; ++i) {
+        for (size_t j = 0; j < col_n; ++j) {
+            res.set(i, j, m1.get(i, j) * m2.get(i ,j));
+        }
+    }
+    return res;
 }
 
 //scalar division
 template <class T>
 Matrix<T> operator / (const Matrix<T> &m1, T c) {
-
+    size_t row_n = m1.rows_num, col_n = m1.cols_num;
+    Matrix<T> res(row_n, col_n);
+    for (size_t i = 0; i < row_n; ++i) {
+        for (size_t j = 0; j < col_n; ++j) {
+            res.set(i, j, m1.get(i, j) / c);
+        }
+    }
+    return res;
 }
 
 //transposition
 template <class T>
-Matrix<T> transpose(const Matrix<T> m) {
-
+Matrix<T> transpose(const Matrix<T> &m) {
+    size_t row_n = m.cols_num, col_n = m.rows_num;
+    Matrix<T> res(row_n, col_n);
+    for (size_t i = 0; i < row_n; ++i) {
+        for (size_t j = 0; j < col_n; ++j) {
+            res.set(i, j, m.get(j, i));
+        }
+    }
+    return res;
 }
 
 //conjugation
 template <class T>
-Matrix<T> conjugate(const Matrix<T> m) {
-
+Matrix< std::complex<T> > conjugate(const Matrix< std::complex<T> > &m) {
+    Matrix< std::complex<T> > res(m.rows_num, m.cols_num);
+    for (size_t i = 0; i < m.rows_num; ++i) {
+        for (size_t j = 0; j < m.cols_num; ++j) {
+            res.set(conj(m.get(i, j)));
+        }
+    }
+    return res;
 }
 
 //dot product
 template <class T>
-Matrix<T> dot(const Matrix<T> v1, const Matrix<T> v2) {
-
+T dot(const Matrix<T> &v1, const Matrix<T> &v2) {
+    size_t dimension = v1.cols_num;
+    T res = 0;
+    for (size_t i = 0; i < dimension; ++i) {
+        res  = res + v1.get(0, i) * v2.get(0, i);
+    }
+    return res;
 }
 
 //cross product
 template <class T>
-Matrix<T> cross(const Matrix<T> v1, const Matrix<T> v2) {
-
+Matrix<T> cross(const Matrix<T> &v1, const Matrix<T> &v2) {
+    Matrix<T> res(1, 3);
+    res.set(0, 0, v1.get(0, 1) * v2.get(0, 2) - v2.get(0, 1) * v1.get(0, 2));
+    res.set(0, 1, v1.get(0, 2) * v2.get(0, 0) - v2.get(0, 2) * v1.get(0, 0));
+    res.set(0, 0, v1.get(0, 0) * v2.get(0, 1) - v2.get(0, 0) * v1.get(0, 1));
+    return res;
 }
 
 //inverse
 template <class T>
-Matrix<T> inverse(const Matrix<T> m) {
-
+Matrix<T> inverse(const Matrix<T> &m) {
+    size_t size = m.rows_num;
+    Matrix<T> res(size, size, m), res_inverse(size, size), L(size, size), U(size, size), L_inverse(size, size), U_inverse(size, size);
+    T s;
+    for (size_t i = 0; i < size; ++i) { // L对角置1
+        L.set(i, i, 1);
+    }
+    for (size_t i = 0; i < size; ++i) {
+        U.set(0, i, m.get(0, i));
+    }
+    for (size_t i = 1; i < size; ++i) {
+        L.set(i, 0, m.get(i, 0) / U.get(0, 0));
+    }
+    for (size_t i = 1; i < size; ++i) {
+        for (size_t j = i; j < size; ++j) {
+            T temp = 0;
+            for (size_t k = 0; k < i; ++k) {
+                temp = temp + L.get(i, k) * U.get(k, j);
+            }
+            U.set(i, j, m.get(i, j) - temp);
+        }
+        for (size_t j = i; j < size; ++j) {
+            T temp = 0;
+            for (size_t k = 0; k < i; ++k) {
+                temp = temp + L.get(j, k) * U.get(k, i);
+            }
+            L.set(j, i, (m.get(j, i) - temp) / U.get(i, i));
+        }
+    }
+    for (size_t j = 0; j < size; ++j) {
+        for (size_t i = j; i < size; ++i) {
+            if (i == j) {
+                L_inverse.set(i, j, 1 / L.get(i, j));
+            }
+            if (i > j) {
+                T temp = 0;
+                for (size_t k = j; k < i; ++k) {
+                    temp = temp + L.get(i, k) * L_inverse.get(k, j);
+                }
+                L_inverse.set(i, j, L_inverse.get(j, j) * (-temp));
+            }
+        }
+    }
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = i; j >= 0; --j) {
+            if (i == j) {
+                U_inverse.set(j, i, 1 / U.get(j, i));
+            }
+            if (j < i) {
+                T temp = 0;
+                for (size_t k = j + 1; k <= i; ++k) {
+                    temp = temp + U.get(j, k) * U_inverse.get(k, i);
+                }
+                U_inverse.set(j, i, -1 / U.get(j, j) * s);
+            }
+        }
+    }
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = 0; j < size; ++j) {
+            T temp = 0;
+            for (size_t k = 0; k < size; ++k) {
+                temp = temp + U_inverse.get(i, k) * L_inverse.get(k, j);
+            }
+            res_inverse.set(i, j, temp);
+        }
+    }
 }
