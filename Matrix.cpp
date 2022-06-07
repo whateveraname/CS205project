@@ -1,11 +1,13 @@
+#include <cstddef>
+
 /*naive version, no shared memory, all hard copy*/
 template <class T>
 class Matrix {
-    int rows_num, cols_num;
+    size_t rows_num, cols_num;
     T* data;
 
     //constructors
-    Matrix(int rows, int cols, T* d) {
+    Matrix(size_t rows, size_t cols, T* d) {
         rows_num = rows;
         cols_num = cols;
         data = new T[rows_num * cols_num];
@@ -37,20 +39,20 @@ class Matrix {
     }
 
     //getter
-    T get(int row, int col) { // row and col start from 0
+    T get(size_t row, size_t col) { // row and col start from 0
         return data[cols_num * row + col];
     }
 
     //setter
-    void set(int row, int col, T val) { // row and col start from 0
+    void set(size_t row, size_t col, T val) { // row and col start from 0
         data[cols_num * row + col] = val;
     }
 
     //finding maximum
-    T max(int start_row, int end_row, int start_col, int end_col) {
+    T max(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
         T max = get(start_row, start_col);
-        for (int i = start_row; i <= end_row; i++) {
-            for (int j = start_col; j <= end_col; j++) {
+        for (size_t i = start_row; i <= end_row; i++) {
+            for (size_t j = start_col; j <= end_col; j++) {
                 get(i, j) > max ? max = get(i, j) : max;
             }
         }
@@ -59,7 +61,7 @@ class Matrix {
     T max() {
         return max(0, rows_num - 1, 0, cols_num - 1);
     }
-    T max(int index, int dir) { //if dir = 0, row-specofic; else col-specific
+    T max(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
         if (dir) {
             return max(0, rows_num - 1, index, index);
         } else {
@@ -68,10 +70,10 @@ class Matrix {
     }
 
     //finding minimum
-    T min(int start_row, int end_row, int start_col, int end_col) {
+    T min(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
         T min = get(start_row, start_col);
-        for (int i = start_row; i <= end_row; i++) {
-            for (int j = start_col; j <= end_col; j++) {
+        for (size_t i = start_row; i <= end_row; i++) {
+            for (size_t j = start_col; j <= end_col; j++) {
                 get(i, j) < min ? min = get(i, j) : min;
             }
         }
@@ -80,7 +82,7 @@ class Matrix {
     T min() {
         return min(0, rows_num - 1, 0, cols_num - 1);
     }
-    T min(int index, int dir) { //if dir = 0, row-specofic; else col-specific
+    T min(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
         if (dir) {
             return min(0, rows_num - 1, index, index);
         } else {
@@ -89,10 +91,10 @@ class Matrix {
     }
 
     //summing
-    T sum(int start_row, int end_row, int start_col, int end_col) {
+    T sum(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
         T sum = 0;
-        for (int i = start_row; i <= end_row; i++) {
-            for (int j = start_col; j <= end_col; j++) {
+        for (size_t i = start_row; i <= end_row; i++) {
+            for (size_t j = start_col; j <= end_col; j++) {
                 sum = sum + get(i, j);
             }
         }
@@ -101,7 +103,7 @@ class Matrix {
     T sum() {
         return sum(0, rows_num - 1, 0, cols_num - 1);
     }
-    T sum(int index, int dir) { //if dir = 0, row-specofic; else col-specific
+    T sum(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
         if (dir) {
             return sum(0, rows_num - 1, index, index);
         } else {
@@ -110,13 +112,13 @@ class Matrix {
     }
 
     //averaging
-    T avg(int start_row, int end_row, int start_col, int end_col) {
+    T avg(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
         return sum(start_row, end_row, start_col, end_col) / ((end_row - start_row + 1) * (end_col - start_col + 1));
     }
     T avg() {
         return avg(0, rows_num - 1, 0, cols_num - 1);
     }
-    T avg(int index, int dir) { //if dir = 0, row-specofic; else col-specific
+    T avg(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
         if (dir) {
             return avg(0, rows_num - 1, index, index);
         } else {
