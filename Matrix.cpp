@@ -3,12 +3,10 @@
 #include <complex>
 #include <iostream>
 #include <memory.h>
-#include <algorithm>
 
 template <class T>
 class Matrix {
 public:
-    enum {FULL, SAME, VALID};
     size_t rows_num, cols_num;
     T* data;
 
@@ -141,11 +139,36 @@ public:
 
     //eigenvectors
 
+
     //traces
+    T trace() {
+        size_t size = rows_num;
+        T res = 0;
+        for (size_t i = 0; i < size; ++i) {
+            res = res + get(i, i);
+        }
+        return res;
+    }
 
     //determinant
     T determinant() {
-
+        size_t size = rows_num;
+        if (size == 1) return get(0, 0);
+        T res = 0;
+        for (size_t i = 0; i < size; ++i) {
+            for (size_t j = 0; j < size; ++j) {
+                if (get(i, j)) {
+                    Matrix<T> temp(size - 1, size - 1);
+                    for (size_t k = 0; k < size - 1; ++k) {
+                        for (size_t l = 0; l < size - 1; ++l) {
+                            temp.set(i, j, get(k < i ? k : k + 1, l < j ? l : l + 1));
+                        }
+                    }
+                    res = res + get(i, j) * temp.determinant() * ((i + j) % 2 ? -1 : 1);
+                }
+            }
+        }
+        return res;
     }
 
     Matrix<T> reshape(size_t row, size_t col){
@@ -315,9 +338,8 @@ Matrix<T> cross(const Matrix<T> &v1, const Matrix<T> &v2) {
 template <class T>
 Matrix<T> inverse(const Matrix<T> &m) {
     size_t size = m.rows_num;
-    Matrix<T> res(size, size, m), res_inverse(size, size), L(size, size), U(size, size), L_inverse(size, size), U_inverse(size, size);
-    T s;
-    for (size_t i = 0; i < size; ++i) { // L对角置1
+    Matrix<T> res(size, size, m), L(size, size), U(size, size), L_inverse(size, size), U_inverse(size, size);
+    for (size_t i = 0; i < size; ++i) {
         L.set(i, i, 1);
     }
     for (size_t i = 0; i < size; ++i) {
@@ -366,7 +388,7 @@ Matrix<T> inverse(const Matrix<T> &m) {
                 for (size_t k = j + 1; k <= i; ++k) {
                     temp = temp + U.get(j, k) * U_inverse.get(k, i);
                 }
-                U_inverse.set(j, i, -1 / U.get(j, j) * s);
+                U_inverse.set(j, i, -1 / U.get(j, j) * temp);
             }
         }
     }
@@ -375,27 +397,6 @@ Matrix<T> inverse(const Matrix<T> &m) {
             T temp = 0;
             for (size_t k = 0; k < size; ++k) {
                 temp = temp + U_inverse.get(i, k) * L_inverse.get(k, j);
-            }
-            res_inverse.set(i, j, temp);
-        }
-    }
-}
-
-template<class T>
-Matrix<T> conv(const Matrix<T>& m1, const Matrix<T>& m2, int mode){
-    size_t rows = m1.rows_num + m2.rows_num - 1;
-    size_t cols = m1.cols_num + m2.cols_num - 1;
-    T* resData = new T[rows * cols];
-    Matrix<T> res(rows, cols, resData);
-    for (size_t i = 0; i < rows; i++){
-        for (size_t j = 0; j < cols; j++){
-            T temp = 0;
-            for (size_t p = 0; p <= i; p++){
-                for (size_t q = 0; q <= j; q++){
-                    if (p < m2.rows_num && q < m2.cols_num && (i - p) < m1.rows_num && (j - q) < m1.cols_num){
-                        temp += m1.get(i - p, j - q) * m2.get(p, q);
-                    }
-                }
             }
             res.set(i, j, temp);
         }
