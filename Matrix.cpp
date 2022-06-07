@@ -313,9 +313,8 @@ Matrix<T> cross(const Matrix<T> &v1, const Matrix<T> &v2) {
 template <class T>
 Matrix<T> inverse(const Matrix<T> &m) {
     size_t size = m.rows_num;
-    Matrix<T> res(size, size, m), res_inverse(size, size), L(size, size), U(size, size), L_inverse(size, size), U_inverse(size, size);
-    T s;
-    for (size_t i = 0; i < size; ++i) { // L对角置1
+    Matrix<T> res(size, size, m), L(size, size), U(size, size), L_inverse(size, size), U_inverse(size, size);
+    for (size_t i = 0; i < size; ++i) {
         L.set(i, i, 1);
     }
     for (size_t i = 0; i < size; ++i) {
@@ -364,7 +363,7 @@ Matrix<T> inverse(const Matrix<T> &m) {
                 for (size_t k = j + 1; k <= i; ++k) {
                     temp = temp + U.get(j, k) * U_inverse.get(k, i);
                 }
-                U_inverse.set(j, i, -1 / U.get(j, j) * s);
+                U_inverse.set(j, i, -1 / U.get(j, j) * temp);
             }
         }
     }
@@ -374,7 +373,8 @@ Matrix<T> inverse(const Matrix<T> &m) {
             for (size_t k = 0; k < size; ++k) {
                 temp = temp + U_inverse.get(i, k) * L_inverse.get(k, j);
             }
-            res_inverse.set(i, j, temp);
+            res.set(i, j, temp);
         }
     }
+    return res;
 }
