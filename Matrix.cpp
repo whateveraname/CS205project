@@ -139,11 +139,36 @@ public:
 
     //eigenvectors
 
+
     //traces
+    T trace() {
+        size_t size = rows_num;
+        T res = 0;
+        for (size_t i = 0; i < size; ++i) {
+            res = res + get(i, i);
+        }
+        return res;
+    }
 
     //determinant
     T determinant() {
-
+        size_t size = rows_num;
+        if (size == 1) return get(0, 0);
+        T res = 0;
+        for (size_t i = 0; i < size; ++i) {
+            for (size_t j = 0; j < size; ++j) {
+                if (get(i, j)) {
+                    Matrix<T> temp(size - 1, size - 1);
+                    for (size_t k = 0; k < size - 1; ++k) {
+                        for (size_t l = 0; l < size - 1; ++l) {
+                            temp.set(i, j, get(k < i ? k : k + 1, l < j ? l : l + 1));
+                        }
+                    }
+                    res = res + get(i, j) * temp.determinant() * ((i + j) % 2 ? -1 : 1);
+                }
+            }
+        }
+        return res;
     }
 
     Matrix<T> reshape(size_t row, size_t col){
