@@ -28,7 +28,7 @@ public:
     ~Matrix();
 
     //getter
-    T get(size_t row, size_t col);
+    T get(size_t row, size_t col) const;
 
     //setter
     void set(size_t row, size_t col, T val);
@@ -69,6 +69,8 @@ public:
 
     template<class C>
     friend std::ostream& operator<<(std::ostream& os, Matrix<C> m);
+
+    bool equals(const Matrix<T> &m);
 };
 
 //matrix addition
@@ -178,7 +180,7 @@ Matrix<T>::~Matrix() {
 
 //getter
 template <class T>
-T Matrix<T>::get(size_t row, size_t col) { // row and col start from 0
+T Matrix<T>::get(size_t row, size_t col) const { // row and col start from 0
     if (row < 0) throw MatrixOutOfBoundException(0, row);
     if (row >= rows_num) throw MatrixOutOfBoundException(rows_num - 1, row);
     if (col < 0) throw MatrixOutOfBoundException(0, col);
@@ -485,6 +487,17 @@ std::ostream &operator<<(std::ostream &os, Matrix<T> m) {
     return os;
 }
 
+template<class T>
+bool Matrix<T>::equals(const Matrix<T> &m) {
+    if (rows_num != m.rows_num || cols_num != m.cols_num) throw InvalidParameterException();
+    for (int i = 0; i < rows_num; ++i) {
+        for (int j = 0; j < cols_num; ++j) {
+            if (get(i, j) != m.get(i, j)) return false;
+        }
+    }
+    return true;
+}
+
 //matrix addition
 template <class T>
 Matrix<T> operator + (const Matrix<T> &m1, const Matrix<T> &m2) {
@@ -594,7 +607,7 @@ Matrix< std::complex<T> > conjugate(const Matrix< std::complex<T> > &m) {
     Matrix< std::complex<T> > res(m.rows_num, m.cols_num);
     for (size_t i = 0; i < m.rows_num; ++i) {
         for (size_t j = 0; j < m.cols_num; ++j) {
-            res.set(conj(m.get(i, j)));
+            res.set(i, j, conj(m.get(i, j)));
         }
     }
     return res;
@@ -619,7 +632,7 @@ Matrix<T> cross(const Matrix<T> &v1, const Matrix<T> &v2) {
     Matrix<T> res(1, 3);
     res.set(0, 0, v1.get(0, 1) * v2.get(0, 2) - v2.get(0, 1) * v1.get(0, 2));
     res.set(0, 1, v1.get(0, 2) * v2.get(0, 0) - v2.get(0, 2) * v1.get(0, 0));
-    res.set(0, 0, v1.get(0, 0) * v2.get(0, 1) - v2.get(0, 0) * v1.get(0, 1));
+    res.set(0, 2, v1.get(0, 0) * v2.get(0, 1) - v2.get(0, 0) * v1.get(0, 1));
     return res;
 }
 
