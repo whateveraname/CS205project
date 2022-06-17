@@ -14,11 +14,11 @@ Matrix<T>::Matrix(size_t rows, size_t cols) {
     data = new T[rows_num * cols_num];
 }
 template <class T>
-Matrix<T>::Matrix(size_t rows, size_t cols, T* d) {
+Matrix<T>::Matrix(size_t rows, size_t cols, void* d) {
     rows_num = rows;
     cols_num = cols;
     data = new T[rows_num * cols_num];
-    memcpy(data, d);
+    memcpy(data, d, sizeof(T) * rows_num * cols_num);
 }
 
 //copy constructor
@@ -30,7 +30,7 @@ Matrix<T>::Matrix(const Matrix& m) {
     rows_num = m.rows_num;
     cols_num = m.cols_num;
     data = new T[rows_num * cols_num];
-    memcpy(data, m.data);
+    memcpy(data, m.data, sizeof(T) * rows_num * cols_num);
 }
 
 //copy assignment
@@ -44,7 +44,7 @@ Matrix<T>& Matrix<T>::operator=(const Matrix& m) {
     rows_num = m.rows_num;
     cols_num = m.cols_num;
     data = new T[rows_num * cols_num];
-    memcpy(data, m.data);
+    memcpy(data, m.data, sizeof(T) * rows_num * cols_num);
     return *this;
 }
 
@@ -324,7 +324,7 @@ T Matrix<T>::determinant() {
 template <class T>
 Matrix<T> Matrix<T>::reshape(size_t row, size_t col){
     if (row * col != rows_num * cols_num) throw InvalidSizeException(rows_num, cols_num, row, col);
-    return Matrix<T>(row, col, data);
+    return Matrix<T>(row, col, (void *)data);
 }
 
 template <class T>
@@ -344,7 +344,7 @@ Matrix<T> Matrix<T>::slice(size_t row_start, size_t row_end, size_t col_start, s
     for(size_t i = row_start; i <= row_end; i++){
         memcpy(d + i * cols, data + i * cols_num + row_start, cols * sizeof(T));
     }
-    Matrix<T> result(rows, cols, d);
+    Matrix<T> result(rows, cols, (void *)d);
     delete[] d;
     return result;  //sliced matrix
 }
@@ -511,12 +511,13 @@ Matrix<T> inverse(const Matrix<T> &m) {
     }
 }
 
+//convolution
 template<class T>
 Matrix<T> conv(const Matrix<T>& m1, const Matrix<T>& m2){
     size_t rows = m1.rows_num + m2.rows_num - 1;
     size_t cols = m1.cols_num + m2.cols_num - 1;
     T* resData = new T[rows * cols];
-    Matrix<T> res(rows, cols, resData);
+    Matrix<T> res(rows, cols, (void *)resData);
     for (size_t i = 0; i < rows; i++){
         for (size_t j = 0; j < cols; j++){
             T temp = 0;
@@ -531,4 +532,15 @@ Matrix<T> conv(const Matrix<T>& m1, const Matrix<T>& m2){
         }
     }
     return res;
+}
+
+//convert from opencv::Mat, we only implement the double type
+Matrix<double> fromCV(cv::Mat &m) {
+    return {(size_t)m.rows, (size_t)m.cols, (void *)m.data};
+}
+
+//convert to opencv::Mat, we only implement the double type
+template<class T>
+cv::Mat toCV(Matrix<T> &m) {
+    return {m.rows_num, m.cols_num, CV_64F, (void *)m.data};
 }

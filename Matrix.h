@@ -1,14 +1,17 @@
 #ifndef C___PROJECT_MATRIX_H
 #define C___PROJECT_MATRIX_H
+
+#include <opencv2/core/mat.hpp>
+
 template <class T>
 class Matrix {
 public:
     size_t rows_num, cols_num;
-    T *data;
+    T* data;
 
     //constructors
     Matrix(size_t rows, size_t cols);
-    Matrix(size_t rows, size_t cols, T* d);
+    Matrix(size_t rows, size_t cols, void* d);
 
     //copy constructor
     Matrix(const Matrix& m);
@@ -108,6 +111,14 @@ Matrix<T> cross(const Matrix<T> &v1, const Matrix<T> &v2);
 template <class T>
 Matrix<T> inverse(const Matrix<T> &m);
 
+//convolution
 template<class T>
 Matrix<T> conv(const Matrix<T>& m1, const Matrix<T>& m2);
+
+//convert from opencv::Mat, we only implement the double type
+Matrix<double> fromCV(cv::Mat &m);
+
+//convert to opencv::Mat, we only implement the double type
+cv::Mat toCV(Matrix<double> &m);
+
 #endif //C___PROJECT_MATRIX_H

@@ -3,10 +3,12 @@ project(C___project)
 
 set(CMAKE_CXX_STANDARD 20)
 
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
 add_executable(C___project Matrix.cpp MatrixException.cpp Matrix.h MyInt.cpp MyInt.h)
 
-#find_package(GTest REQUIRED)
-#include_directories(${GTEST_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
 enable_testing()
 add_executable(
