@@ -6,7 +6,7 @@
 TEST(TypeTest, Int) {
     int data[2][2]{{1, 2}, {3, 4}};
     Matrix<int> m(2, 2, (void*)data);
-    ASSERT_EQ(m.get(1, 1), 4);
+    ASSERT_EQ(m.get(0, 0), 1);
 }
 
 TEST(TypeTest, Double){

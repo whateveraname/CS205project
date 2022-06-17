@@ -459,3 +459,31 @@ Parsed CXX implicit link information from above output:
   implicit fwks: []
 
 
+Determining if the include file pthread.h exists passed with the following output:
+Change Dir: /mnt/d/CS205project/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_45dca/fast && /usr/bin/make -f CMakeFiles/cmTC_45dca.dir/build.make CMakeFiles/cmTC_45dca.dir/build
+make[1]: Entering directory '/mnt/d/CS205project/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_45dca.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_45dca.dir/CheckIncludeFile.c.o   -c /mnt/d/CS205project/cmake-build-debug/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_45dca
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_45dca.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_45dca.dir/CheckIncludeFile.c.o  -o cmTC_45dca 
+make[1]: Leaving directory '/mnt/d/CS205project/cmake-build-debug/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function pthread_create exists in the pthread passed with the following output:
+Change Dir: /mnt/d/CS205project/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_3ffbf/fast && /usr/bin/make -f CMakeFiles/cmTC_3ffbf.dir/build.make CMakeFiles/cmTC_3ffbf.dir/build
+make[1]: Entering directory '/mnt/d/CS205project/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3ffbf.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_3ffbf.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
+Linking C executable cmTC_3ffbf
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3ffbf.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_3ffbf.dir/CheckFunctionExists.c.o  -o cmTC_3ffbf  -lpthread 
+make[1]: Leaving directory '/mnt/d/CS205project/cmake-build-debug/CMakeFiles/CMakeTmp'
+
+
+
