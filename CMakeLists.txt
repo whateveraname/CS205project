@@ -3,4 +3,4 @@ project(C___project)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(C___project Matrix.cpp MatrixException.cpp)
+add_executable(C___project Matrix.cpp MatrixException.cpp Matrix.h)

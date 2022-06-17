@@ -3,328 +3,351 @@
 #include <complex>
 #include <iostream>
 #include <memory.h>
+#include "Matrix.h"
+#include "MatrixException.cpp"
 
+//constructors
 template <class T>
-class Matrix {
-public:
-    size_t rows_num, cols_num;
-    T* data;
+Matrix<T>::Matrix(size_t rows, size_t cols) {
+    rows_num = rows;
+    cols_num = cols;
+    data = new T[rows_num * cols_num];
+}
+template <class T>
+Matrix<T>::Matrix(size_t rows, size_t cols, T* d) {
+    rows_num = rows;
+    cols_num = cols;
+    data = new T[rows_num * cols_num];
+    memcpy(data, d);
+}
 
-    //constructors
-    Matrix(size_t rows, size_t cols) {
-        rows_num = rows;
-        cols_num = cols;
-        data = new T[rows_num * cols_num];
+//copy constructor
+template <class T>
+Matrix<T>::Matrix(const Matrix& m) {
+    if (m.rows_num != rows_num || m.cols_num != cols_num) {
+        throw InvalidSizeException(rows_num, cols_num, m.rows_num, m.cols_num);
     }
-    Matrix(size_t rows, size_t cols, T* d) {
-        rows_num = rows;
-        cols_num = cols;
-        data = new T[rows_num * cols_num];
-        memcpy(data, d);
-    }
+    rows_num = m.rows_num;
+    cols_num = m.cols_num;
+    data = new T[rows_num * cols_num];
+    memcpy(data, m.data);
+}
 
-    //copy constructor
-    Matrix(const Matrix& m) {
-        rows_num = m.rows_num;
-        cols_num = m.cols_num;
-        data = new T[rows_num * cols_num];
-        memcpy(data, m.data);
+//copy assignment
+template <class T>
+Matrix<T>& Matrix<T>::operator=(const Matrix& m) {
+    if (m.rows_num != rows_num || m.cols_num != cols_num) {
+        throw InvalidSizeException(rows_num, cols_num, m.rows_num, m.cols_num);
     }
+    if (this == &m) return *this;
+    delete[] data;
+    rows_num = m.rows_num;
+    cols_num = m.cols_num;
+    data = new T[rows_num * cols_num];
+    memcpy(data, m.data);
+    return *this;
+}
 
-    //copy assignment
-    Matrix& operator=(const Matrix& m) {
-        if (this == &m) return *this;
-        delete[] data;
-        rows_num = m.rows_num;
-        cols_num = m.cols_num;
-        data = new T[rows_num * cols_num];
-        memcpy(data, m.data);
-        return *this;
-    }
+//destructor
+template <class T>
+Matrix<T>::~Matrix() {
+    delete[] data;
+}
 
-    //destructor
-    ~Matrix() {
-        delete[] data;
-    }
+//getter
+template <class T>
+T Matrix<T>::get(size_t row, size_t col) { // row and col start from 0
+    if (row < 0) throw MatrixOutOfBoundException(0, row);
+    if (row >= rows_num) throw MatrixOutOfBoundException(rows_num - 1, row);
+    if (col < 0) throw MatrixOutOfBoundException(0, col);
+    if (col >= cols_num) throw MatrixOutOfBoundException(cols_num - 1, col);
+    return data[cols_num * row + col];
+}
 
-    //getter
-    T get(size_t row, size_t col) { // row and col start from 0
-        return data[cols_num * row + col];
-    }
+//setter
+template <class T>
+void Matrix<T>::set(size_t row, size_t col, T val) { // row and col start from 0
+    if (row < 0) throw MatrixOutOfBoundException(0, row);
+    if (row >= rows_num) throw MatrixOutOfBoundException(rows_num - 1, row);
+    if (col < 0) throw MatrixOutOfBoundException(0, col);
+    if (col >= cols_num) throw MatrixOutOfBoundException(cols_num - 1, col);
+    data[cols_num * row + col] = val;
+}
 
-    //setter
-    void set(size_t row, size_t col, T val) { // row and col start from 0
-        data[cols_num * row + col] = val;
-    }
-
-    //finding maximum
-    T max(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
+//finding maximum
+template <class T>
+T Matrix<T>::max(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
+    if (start_row > end_row || start_col > end_col) throw InvalidParameterException();
+    try {
         T max = get(start_row, start_col);
         for (size_t i = start_row; i <= end_row; i++) {
             for (size_t j = start_col; j <= end_col; j++) {
                 get(i, j) > max ? max = get(i, j) : max;
             }
         }
-        return max;
+    } catch (MatrixOutOfBoundException& e) {
+        throw e;
     }
-    T max() {
+    return max;
+}
+template <class T>
+T Matrix<T>::max() {
+    try {
         return max(0, rows_num - 1, 0, cols_num - 1);
+    } catch (MatrixException &e) {
+        throw e;
     }
-    T max(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
+}
+template <class T>
+T Matrix<T>::max(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
+    try {
         if (dir) {
             return max(0, rows_num - 1, index, index);
         } else {
             return max(index, index, 0, cols_num - 1);
         }
+    } catch (MatrixException& e) {
+        throw e;
     }
+}
 
-    //finding minimum
-    T min(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
+//finding minimum
+template <class T>
+T Matrix<T>::min(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
+    if (start_row > end_row || start_col > end_col) throw InvalidParameterException();
+    try {
         T min = get(start_row, start_col);
         for (size_t i = start_row; i <= end_row; i++) {
             for (size_t j = start_col; j <= end_col; j++) {
                 get(i, j) < min ? min = get(i, j) : min;
             }
         }
-        return min;
+    } catch (MatrixOutOfBoundException& e) {
+        throw e;
     }
-    T min() {
+    return min;
+}
+template <class T>
+T Matrix<T>::min() {
+    try {
         return min(0, rows_num - 1, 0, cols_num - 1);
+    } catch (MatrixException& e) {
+        throw e;
     }
-    T min(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
+}
+template <class T>
+T Matrix<T>::min(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
+    try {
         if (dir) {
             return min(0, rows_num - 1, index, index);
         } else {
             return min(index, index, 0, cols_num - 1);
         }
+    } catch (MatrixException& e) {
+        throw e;
     }
+}
 
-    //summing
-    T sum(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
+//summing
+template <class T>
+T Matrix<T>::sum(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
+    if (start_row > end_row || start_col > end_col) throw InvalidParameterException();
+    try {
         T sum = 0;
         for (size_t i = start_row; i <= end_row; i++) {
             for (size_t j = start_col; j <= end_col; j++) {
                 sum = sum + get(i, j);
             }
         }
-        return sum;
+    } catch (MatrixOutOfBoundException& e) {
+        throw e;
     }
-    T sum() {
+    return sum;
+}
+template <class T>
+T Matrix<T>::sum() {
+    try {
         return sum(0, rows_num - 1, 0, cols_num - 1);
+    } catch (MatrixException& e) {
+        throw e;
     }
-    T sum(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
+}
+template <class T>
+T Matrix<T>::sum(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
+    try {
         if (dir) {
             return sum(0, rows_num - 1, index, index);
         } else {
             return sum(index, index, 0, cols_num - 1);
         }
+    } catch (MatrixException& e) {
+        throw e;
     }
+}
 
-    //averaging
-    T avg(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
+//averaging
+template <class T>
+T Matrix<T>::avg(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
+    try {
         return sum(start_row, end_row, start_col, end_col) / ((end_row - start_row + 1) * (end_col - start_col + 1));
+    } catch (MatrixException& e) {
+        throw e;
     }
-    T avg() {
+}
+template <class T>
+T Matrix<T>::avg() {
+    try {
         return avg(0, rows_num - 1, 0, cols_num - 1);
+    } catch (MatrixException& e) {
+        throw e;
     }
-    T avg(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
+}
+template <class T>
+T Matrix<T>::avg(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
+    try {
         if (dir) {
             return avg(0, rows_num - 1, index, index);
         } else {
             return avg(index, index, 0, cols_num - 1);
         }
+    } catch (MatrixOutOfBoundException& e) {
+        throw e;
     }
+}
 
-    //eigenvalues
-    static Matrix<T> hessenberg(Matrix<T> &m) {
-
+//eigenvalues and eigenvectors
+template <class T>
+T norm(T* a, size_t n) {
+    T sum = 0;
+    for (int i = 0; i < n; ++i) {
+        sum += a[i] * a[i];
     }
-    bool eigenvalues(size_t max_iter, double eps, double *res) {
+    return (T)sqrt(sum);
+}
+template <class T>
+void QR(Matrix<T>& A, Matrix<T>& Q, Matrix<T>& R) {
+    size_t n = A.rows_num;
+    T a[n], b[n];
+    for (int j = 0; j < n; ++j) {
+        for (int i = 0; i < n; ++i) {
+            a[i] = b[i] = A.get(i, j);
+        }
+        for (int k = 0; k < j; ++k) {
+            R.set(k, j, 0);
+            for (int l = 0; l < n; ++l) {
+                R.set(k, j, R.get(k, j) + a[l] * Q.get(l, k));
+            }
+            for (int l = 0; l < n; ++l) {
+                b[l] -= R.get(k, j) * Q.get(l, k);
+            }
+        }
+        T norm = norm(b, n);
+        R.set(j, j, norm);
+        for (int i = 0; i < n; ++i) {
+            Q.set(i, j, b[i] / norm);
+        }
+    }
+}
+template <class T>
+void Matrix<T>::eig(T* eigen_values, Matrix<T>& eigen_vectors) {
+    if (rows_num != cols_num) throw NotASquareMatrixException();
+    try {
         size_t n = rows_num;
-        size_t iter_num;
-        Matrix<T> matrix_hessenberg = hessenberg(*this);
-        while (n != 0) {
-            size_t t = n - 1;
-            while (t > 0) {
-                T temp = abs(matrix_hessenberg.get(t - 1, t - 1));
-                temp = temp + abs(matrix_hessenberg.get(t, t));
-                temp = temp * eps;
-                if (abs(matrix_hessenberg.get(t, t - 1)) > temp) {
-                    t--;
-                } else {
-                    break;
+        Matrix<T> Q(n, n), R(n, n), temp = *this;
+        size_t iter_num = n;
+        for (int i = 0; i < iter_num; ++i) {
+            QR(temp, Q, R);
+            temp = R * Q;
+        }
+        for (int i = 0; i < n; ++i) {
+            eigen_values[i] = temp.get(i, i);
+        }
+        eigen_vectors = Q;
+    } catch (InvalidSizeException& e) {
+        throw e;
+    }
+}
+
+//traces
+template <class T>
+T Matrix<T>::trace() {
+    if (rows_num != cols_num) throw NotASquareMatrixException();
+    size_t size = rows_num;
+    T res = 0;
+    for (size_t i = 0; i < size; ++i) {
+        res = res + get(i, i);
+    }
+    return res;
+}
+
+template <class T>
+Matrix<T> Matrix<T>::company_matrix() {
+    size_t size = rows_num;
+    Matrix<T> result(size, size);
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = 0; j < size; ++j) {
+            Matrix<T> temp(size - 1, size - 1);
+            for (size_t k = 0; k < size - 1; ++k) {
+                for (size_t l = 0; l < size - 1; ++l) {
+                    temp.set(i, j, get(k < i ? k : k + 1, l < j ? l : l + 1));
                 }
             }
-            if (t == n - 1) {
-                res[(n - 1) * 2] = matrix_hessenberg.get(n - 1, n - 1);
-                res[(n - 1) * 2 + 1] = 0;
-                n -= 1;
-                iter_num = max_iter;
-            } else if (t == n - 2) {
-                T b, c, d, y, xy;
-                b = -matrix_hessenberg.get(n - 1, n - 1) - matrix_hessenberg.get(n - 2, n - 2);
-                c = matrix_hessenberg.get(n - 1, n - 1) * matrix_hessenberg.get(n - 2, n - 2) - matrix_hessenberg.get(n - 1, n - 2) * matrix_hessenberg.get(n - 2, n - 1);
-                d = b * b - 4 * c;
-                y = sqrt(abs(d));
-                if (d > 0) {
-                    xy = 1;
-                    if (b < 0) {
-                        xy = -1;
+            result.set(i, j, temp.determinant() * ((i + j) % 2 ? -1 : 1));
+        }
+    }
+    return transpose(result);
+}
+
+//determinant
+template <class T>
+T Matrix<T>::determinant() {
+    if (rows_num != cols_num) throw NotASquareMatrixException();
+    size_t size = rows_num;
+    if (size == 1) return get(0, 0);
+    T res = 0;
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = 0; j < size; ++j) {
+            if (get(i, j)) {
+                Matrix<T> temp(size - 1, size - 1);
+                for (size_t k = 0; k < size - 1; ++k) {
+                    for (size_t l = 0; l < size - 1; ++l) {
+                        temp.set(i, j, get(k < i ? k : k + 1, l < j ? l : l + 1));
                     }
-                    res[(n - 1) * 2] = -(b + xy * y) / 2;
-                    res[(n - 1) * 2 + 1] = 0;
-                    res[(n - 2) * 2] = c / res[(n - 1) * 2];
-                    res[(n - 2) * 2 + 1] = 0;
-                } else {
-                    res[(n - 1) * 2] = -b / 2;
-                    res[(n - 2) * 2] = -b / 2;
-                    res[(n - 1) * 2 + 1] = y / 2;
-                    res[(n - 2) * 2 + 1] = -y / 2;
                 }
-                n -= 2;
-                iter_num = max_iter;
-            } else {
-                if (iter_num < 1) return false;
-                iter_num--;
-                size_t j = t + 2, k = t;
-                T p, q, r, b, c, x, y, xy, s, e, f, g, z;
-                while ( j < n) {
-                    matrix_hessenberg.set(j, j - 2, 0);
-                    j++;
-                }
-                j = t + 3;
-                while (j < n) {
-                    matrix_hessenberg.set(j, j - 3, 0);
-                    j++;
-                }
-                while ( k < n - 1) {
-                    if (k != t) {
-                        p = matrix_hessenberg.get(k, k - 1);
-                        q = matrix_hessenberg.get(k + 1, k - 1);
-                        if (k != n - 2) {
-                            r = matrix_hessenberg.get(k + 2, k - 1);
-                        } else {
-                            r = 0;
-                        }
-                    } else {
-                        b = matrix_hessenberg.get(n - 1, n - 1);
-                        c = matrix_hessenberg.get(n - 2, n - 2);
-                        x = b + c;
-                        y = b * c - matrix_hessenberg.get(n - 1, n - 2) * matrix_hessenberg.get(n - 2, n - 1);
-                        p = matrix_hessenberg.get(t, t) * (matrix_hessenberg.get(t, t) - x) + matrix_hessenberg.get(t, t + 1) * matrix_hessenberg.get(t + 1, t) + y;
-                        q = matrix_hessenberg.get(t + 1, t) * (matrix_hessenberg.get(t, t) + matrix_hessenberg.get(t + 1, t + 1) - x);
-                        r = matrix_hessenberg.get(t + 1, t) * matrix_hessenberg.get(t + 2, t + 1);
-                    }
-                    if (p != 0 || q != 0 || r != 0) {
-                        if (p<0) {
-                            xy = -1;
-                        } else {
-                            xy = 1;
-                        }
-                        s= xy * sqrt(p * p + q * q + r * r);
-                        if (k != t) {
-                            matrix_hessenberg.set(k, k - 1, -s);
-                        }
-                        e = -q / s;
-                        f = -r / s;
-                        x = -p / s;
-                        y = -x - f * r / (p + s);
-                        g = e * r / (p + s);
-                        z = -x - e * q / (p + s);
-                        for (j = k; j < n; j++) {
-                            b = matrix_hessenberg.get(k, j);
-                            c = matrix_hessenberg.get(k + 1, j);
-                            p = x * b + e * c;
-                            q = e * b + y * c;
-                            r = f * b + g * c;
-                            if (k != n - 2) {
-                                b = matrix_hessenberg.get(k + 2, j);
-                                p += f * b;
-                                q += g * b;
-                                r += z * b;
-                                matrix_hessenberg.set(k + 2, j, r);
-                            }
-                            matrix_hessenberg.set(k + 1, j, q);
-                            matrix_hessenberg.set(k, j, p);
-                        }
-                        j = k + 3;
-                        if (j > n - 2) {
-                            j = n - 1;
-                        }
-                        for (size_t i = t; i < j + 1; i++) {
-                            b = matrix_hessenberg.get(i, k);
-                            c = matrix_hessenberg.get(i, k + 1);
-                            p = x * b + e * c;
-                            q = e * b + y * c;
-                            r = f * b + g * c;
-                            if (k != n - 2) {
-                                b = matrix_hessenberg.get(i, k + 2);;
-                                p += f * b;
-                                q += g * b;
-                                r += z * b;
-                                matrix_hessenberg.set(i, k + 2, r);
-                            }
-                            matrix_hessenberg.set(i, k + 1, q);
-                            matrix_hessenberg.set(i, k, p);
-                        }
-                    }
-                    k++;
-                }
+                res = res + get(i, j) * temp.determinant() * ((i + j) % 2 ? -1 : 1);
             }
         }
-        return true;
     }
+    return res;
+}
 
-    //eigenvectors
+template <class T>
+Matrix<T> Matrix<T>::reshape(size_t row, size_t col){
+    if (row * col != rows_num * cols_num) throw InvalidSizeException(rows_num, cols_num, row, col);
+    return Matrix<T>(row, col, data);
+}
 
-
-    //traces
-    T trace() {
-        size_t size = rows_num;
-        T res = 0;
-        for (size_t i = 0; i < size; ++i) {
-            res = res + get(i, i);
-        }
-        return res;
+template <class T>
+Matrix<T> Matrix<T>::slice(size_t row_start, size_t row_end, size_t col_start, size_t col_end){    //start from 0, including start and end
+    if (row_start < 0) throw MatrixOutOfBoundException(0, row_start);
+    if (row_start >= rows_num) throw MatrixOutOfBoundException(rows_num - 1, row_start);
+    if (col_start < 0) throw MatrixOutOfBoundException(0, col_start);
+    if (col_start >= cols_num) throw MatrixOutOfBoundException(cols_num - 1, col_start);
+    if (row_end < 0) throw MatrixOutOfBoundException(0, row_end);
+    if (row_end >= rows_num) throw MatrixOutOfBoundException(rows_num - 1, row_end);
+    if (col_end < 0) throw MatrixOutOfBoundException(0, col_end);
+    if (col_end >= cols_num) throw MatrixOutOfBoundException(cols_num - 1, col_end);
+    if (row_start > row_end || col_start > col_end) throw InvalidParameterException();
+    size_t rows = row_end - row_start + 1;
+    size_t cols = col_end - col_start + 1;
+    T* d = new T[rows * cols];
+    for(size_t i = row_start; i <= row_end; i++){
+        memcpy(d + i * cols, data + i * cols_num + row_start, cols);
     }
-
-    //determinant
-    T determinant() {
-        size_t size = rows_num;
-        if (size == 1) return get(0, 0);
-        T res = 0;
-        for (size_t i = 0; i < size; ++i) {
-            for (size_t j = 0; j < size; ++j) {
-                if (get(i, j)) {
-                    Matrix<T> temp(size - 1, size - 1);
-                    for (size_t k = 0; k < size - 1; ++k) {
-                        for (size_t l = 0; l < size - 1; ++l) {
-                            temp.set(i, j, get(k < i ? k : k + 1, l < j ? l : l + 1));
-                        }
-                    }
-                    res = res + get(i, j) * temp.determinant() * ((i + j) % 2 ? -1 : 1);
-                }
-            }
-        }
-        return res;
-    }
-
-    Matrix<T> reshape(size_t row, size_t col){
-        return Matrix<T>(row, col, data);
-    }
-
-    Matrix<T> slice(size_t row_start, size_t row_end, size_t col_start, size_t col_end){    //start from 0, including start and end
-        size_t rows = row_end - row_start + 1;
-        size_t cols = col_end - col_start + 1;
-        T* d = new T[rows * cols];
-        for(size_t i = row_start; i <= row_end; i++){
-            memcpy(d + i * cols, data + i * cols_num + row_start, cols);
-        }
-        return Matrix<T>(rows, cols, d);  //sliced matrix
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, Matrix<T> m);
-};
+    Matrix<T> result(rows, cols, d);
+    delete[] d;
+    return result;  //sliced matrix
+}
 
 template<class T>
 std::ostream &operator<<(std::ostream &os, Matrix<T> m) {
@@ -343,6 +366,7 @@ std::ostream &operator<<(std::ostream &os, Matrix<T> m) {
 //matrix addition
 template <class T>
 Matrix<T> operator + (const Matrix<T> &m1, const Matrix<T> &m2) {
+    if (m1.rows_num != m2.rows_num || m1.cols_num != m2.cols_num) throw OperandsSizeIncompatibleException();
     size_t row_n = m1.rows_num, col_n = m1.cols_num;
     Matrix<T> res(row_n, col_n);
     for (size_t i = 0; i < row_n; ++i) {
@@ -356,6 +380,7 @@ Matrix<T> operator + (const Matrix<T> &m1, const Matrix<T> &m2) {
 //matrix subtraction
 template <class T>
 Matrix<T> operator - (const Matrix<T> &m1, const Matrix<T> &m2) {
+    if (m1.rows_num != m2.rows_num || m1.cols_num != m2.cols_num) throw OperandsSizeIncompatibleException();
     size_t row_n = m1.rows_num, col_n = m1.cols_num;
     Matrix<T> res(row_n, col_n);
     for (size_t i = 0; i < row_n; ++i) {
@@ -386,12 +411,13 @@ Matrix<T> operator * (T c, const Matrix<T> &m2) {
 //matrix multiplication
 template <class T>
 Matrix<T> operator * (const Matrix<T> &m1, const Matrix<T> &m2) {
-    size_t size = m1.rows_num;
-    Matrix<T> res(size, size);
-    for (size_t i = 0; i < size; ++i) {
-        for (size_t j = 0; j < size; ++j) {
+    if (m1.cols_num != m2.rows_num) throw OperandsSizeIncompatibleException();
+    size_t row = m1.rows_num, col = m2.cols_num;
+    Matrix<T> res(row, col);
+    for (size_t i = 0; i < row; ++i) {
+        for (size_t j = 0; j < col; ++j) {
             T temp = 0;
-            for (size_t k = 0; k < size; ++k) {
+            for (size_t k = 0; k < m1.cols_num; ++k) {
                 temp = temp + m1.get(i, k) * m2.get(k, j);
             }
             res.set(i, j, temp);
@@ -403,6 +429,7 @@ Matrix<T> operator * (const Matrix<T> &m1, const Matrix<T> &m2) {
 //element-wise multiplication
 template <class T>
 Matrix<T> element_wise_multiplication(const Matrix<T> &m1, const Matrix<T> &m2) {
+    if (m1.rows_num != m2.rows_num || m1.cols_num != m2.cols_num) throw OperandsSizeIncompatibleException();
     size_t row_n = m1.rows_num, col_n = m1.cols_num;
     Matrix<T> res(row_n, col_n);
     for (size_t i = 0; i < row_n; ++i) {
@@ -454,6 +481,7 @@ Matrix< std::complex<T> > conjugate(const Matrix< std::complex<T> > &m) {
 //dot product
 template <class T>
 T dot(const Matrix<T> &v1, const Matrix<T> &v2) {
+    if (v1.cols_num != v2.cols_num) throw OperandsSizeIncompatibleException();
     size_t dimension = v1.cols_num;
     T res = 0;
     for (size_t i = 0; i < dimension; ++i) {
@@ -465,6 +493,7 @@ T dot(const Matrix<T> &v1, const Matrix<T> &v2) {
 //cross product
 template <class T>
 Matrix<T> cross(const Matrix<T> &v1, const Matrix<T> &v2) {
+    if (v1.cols_num != 3 || v2.cols_num != 3) throw InvalidParameterException();
     Matrix<T> res(1, 3);
     res.set(0, 0, v1.get(0, 1) * v2.get(0, 2) - v2.get(0, 1) * v1.get(0, 2));
     res.set(0, 1, v1.get(0, 2) * v2.get(0, 0) - v2.get(0, 2) * v1.get(0, 0));
@@ -475,71 +504,11 @@ Matrix<T> cross(const Matrix<T> &v1, const Matrix<T> &v2) {
 //inverse
 template <class T>
 Matrix<T> inverse(const Matrix<T> &m) {
-    size_t size = m.rows_num;
-    Matrix<T> res(size, size, m), L(size, size), U(size, size), L_inverse(size, size), U_inverse(size, size);
-    for (size_t i = 0; i < size; ++i) {
-        L.set(i, i, 1);
+    try {
+        return m.company_matrix() / m.determinant();
+    } catch (MatrixException& e) {
+        throw e;
     }
-    for (size_t i = 0; i < size; ++i) {
-        U.set(0, i, m.get(0, i));
-    }
-    for (size_t i = 1; i < size; ++i) {
-        L.set(i, 0, m.get(i, 0) / U.get(0, 0));
-    }
-    for (size_t i = 1; i < size; ++i) {
-        for (size_t j = i; j < size; ++j) {
-            T temp = 0;
-            for (size_t k = 0; k < i; ++k) {
-                temp = temp + L.get(i, k) * U.get(k, j);
-            }
-            U.set(i, j, m.get(i, j) - temp);
-        }
-        for (size_t j = i; j < size; ++j) {
-            T temp = 0;
-            for (size_t k = 0; k < i; ++k) {
-                temp = temp + L.get(j, k) * U.get(k, i);
-            }
-            L.set(j, i, (m.get(j, i) - temp) / U.get(i, i));
-        }
-    }
-    for (size_t j = 0; j < size; ++j) {
-        for (size_t i = j; i < size; ++i) {
-            if (i == j) {
-                L_inverse.set(i, j, 1 / L.get(i, j));
-            }
-            if (i > j) {
-                T temp = 0;
-                for (size_t k = j; k < i; ++k) {
-                    temp = temp + L.get(i, k) * L_inverse.get(k, j);
-                }
-                L_inverse.set(i, j, L_inverse.get(j, j) * (-temp));
-            }
-        }
-    }
-    for (size_t i = 0; i < size; ++i) {
-        for (size_t j = i; j >= 0; --j) {
-            if (i == j) {
-                U_inverse.set(j, i, 1 / U.get(j, i));
-            }
-            if (j < i) {
-                T temp = 0;
-                for (size_t k = j + 1; k <= i; ++k) {
-                    temp = temp + U.get(j, k) * U_inverse.get(k, i);
-                }
-                U_inverse.set(j, i, -1 / U.get(j, j) * temp);
-            }
-        }
-    }
-    for (size_t i = 0; i < size; ++i) {
-        for (size_t j = 0; j < size; ++j) {
-            T temp = 0;
-            for (size_t k = 0; k < size; ++k) {
-                temp = temp + U_inverse.get(i, k) * L_inverse.get(k, j);
-            }
-            res.set(i, j, temp);
-        }
-    }
-    return res;
 }
 
 template<class T>
