@@ -5,7 +5,7 @@
 
 TEST(TypeTest, Int) {
     int data[2][2]{{1, 2}, {3, 4}};
-    Matrix<int> m(2, 2, (int*)data);
+    Matrix<int> m(2, 2, (void*)data);
 }
 
 TEST(TypeTest, Double){
