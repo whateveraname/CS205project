@@ -1,5 +1,7 @@
 #include <exception>
 #include <string>
+#include <cstring>
+
 class MatrixException : public std::exception {};
 
 class InvalidSizeException : public MatrixException {
