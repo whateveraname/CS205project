@@ -1,5 +1,5 @@
-/Users/yanqichen/CLionProjects/CS205project/cmake-build-debug/CMakeFiles/C___project.dir
-/Users/yanqichen/CLionProjects/CS205project/cmake-build-debug/CMakeFiles/matrix_test.dir
-/Users/yanqichen/CLionProjects/CS205project/cmake-build-debug/CMakeFiles/test.dir
-/Users/yanqichen/CLionProjects/CS205project/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/yanqichen/CLionProjects/CS205project/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/mnt/d/CS205project/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/mnt/d/CS205project/cmake-build-debug/CMakeFiles/edit_cache.dir
+/mnt/d/CS205project/cmake-build-debug/CMakeFiles/test.dir
+/mnt/d/CS205project/cmake-build-debug/CMakeFiles/matrix_test.dir
+/mnt/d/CS205project/cmake-build-debug/CMakeFiles/C___project.dir
