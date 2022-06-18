@@ -177,40 +177,81 @@ public:
      * @brief Find the eigen value and the eigen vector of the matrix.
      * @param eigen_values An array to store the eigen values.
      * @param eigen_vectors An n * n matrix to store the eigen vectors, each column stores an eigen vector.
-     * @throws
+     * @throws NotASquareMatrixException If the matrix is not a square matrix.
      */
     void eig(T *eigen_values, Matrix<T> &eigen_vectors);
 
-    //traces
+    /**
+     * @brief Find the trace of the matrix.
+     * @return The trace.
+     */
     T trace();
 
-    //determinant
+    /**
+     * @brief Find the company matrix of the matrix.
+     * @return The company matrix.
+     */
     Matrix<T> company_matrix() const;
 
+    /**
+     * @brief Find the determinant of the matrix.
+     * @return The determinant.
+     */
     T determinant() const;
 
+    /**
+     * @brief Reshape the matrix.
+     * @param row The row number of the reshaped matrix.
+     * @param col The column number of the reshaped matrix.
+     * @return The reshaped matrix.
+     * @throws InvalidSizeException If the number of values in the reshaped matrix is not equal to that of the original matrix.
+     */
     Matrix<T> reshape(size_t row, size_t col);
 
+    /**
+     * @brief Slice the matrix.
+     * @param row_start The starting row number of the sliced matrix.
+     * @param row_end The ending row number of the sliced matrix.
+     * @param col_start The starting column number of the sliced matrix.
+     * @param col_end The ending column number of the sliced matrix.
+     * @return The sliced matrix.
+     * @throws MatrixOutOfBoundException
+     */
     Matrix<T> slice(size_t row_start, size_t row_end, size_t col_start, size_t col_end);
 
+    /**
+     * @brief Override the << operator for outputting the matrix.
+     */
     template<class C>
     friend std::ostream &operator<<(std::ostream &os, Matrix<C> m);
 
+    /**
+     * @brief Determine whether the row number, column number and all values of two matrices are exactly the same.
+     */
     bool equals(const Matrix<T> &m);
 };
 
-//matrix addition
+/**
+ * @brief Override the + operator for matrix addition.
+ */
 template<class T>
 Matrix<T> operator+(const Matrix<T> &m1, const Matrix<T> &m2);
 
-//matrix subtraction
+/**
+ * @brief Override the - operator for matrix substraction.
+ */
 template<class T>
 Matrix<T> operator-(const Matrix<T> &m1, const Matrix<T> &m2);
 
-//scalar multiplication
+/**
+ * @brief Override the * operator for scalar multiplication with .
+ */
 template<class T>
 Matrix<T> operator*(const Matrix<T> &m1, T c);
 
+/**
+ * @brief Override the * operator for scalar multiplication.
+ */
 template<class T>
 Matrix<T> operator*(T c, const Matrix<T> &m2);
 
