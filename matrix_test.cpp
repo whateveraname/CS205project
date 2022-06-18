@@ -91,6 +91,16 @@ TEST(TransformationTest, conjugate) {
     ASSERT_TRUE(res.equals(conjugate(a)));
 }
 
+TEST(TransformationTest, inverse) {
+    int data[2][2]{{1,  2},
+                   {-1, -3}};
+    Matrix<int> a(2, 2, (void*)data);
+    int res_d[2][2]{{3,  2},
+                    {-1, -1}};
+    Matrix<int> res(2, 2, (void*)res_d);
+    ASSERT_TRUE(res.equals(inverse(a)));
+}
+
 TEST(VectorCalcTest, dot) {
     int d1[3]{1, 2, 3};
     int d2[3]{4, 5, 6};
@@ -109,6 +119,80 @@ TEST(VectorCalcTest, cross) {
     ASSERT_TRUE(res.equals(cross(v1, v2)));
 }
 
+TEST(ReductionTest, max) {
+    int data[2][2]{{1, 2},
+                   {3, 4}};
+    Matrix<int> a(2, 2, (void*)data);
+    ASSERT_EQ(a.max(), 4);
+    ASSERT_EQ(a.max(0, 0, 0, 1), 2);
+    ASSERT_EQ(a.max(1, 1), 4);
+}
+
+TEST(ReductionTest, min) {
+    int data[2][2]{{1, 2},
+                   {3, 4}};
+    Matrix<int> a(2, 2, (void*)data);
+    ASSERT_EQ(a.min(), 1);
+    ASSERT_EQ(a.min(0, 0, 0, 1), 1);
+    ASSERT_EQ(a.min(1, 1), 2);
+}
+
+TEST(ReductionTest, sum) {
+    int data[2][2]{{1, 2},
+                   {3, 4}};
+    Matrix<int> a(2, 2, (void*)data);
+    ASSERT_EQ(a.sum(), 10);
+    ASSERT_EQ(a.sum(0, 0, 0, 1), 3);
+    ASSERT_EQ(a.sum(1, 1), 6);
+}
+
+TEST(ReductionTest, avg) {
+    int data[2][2]{{4, 8},
+                   {12, 16}};
+    Matrix<int> a(2, 2, (void*)data);
+    ASSERT_EQ(a.avg(), 10);
+    ASSERT_EQ(a.avg(0, 0, 0, 1), 6);
+    ASSERT_EQ(a.avg(1, 1), 12);
+}
+
+TEST(TestSuite5, eig) {
+    double data[3][3]{{1, 0,  2},
+                      {0, -1, 0},
+                      {0, 4,  2}};
+    Matrix<double> a(3, 3, (void *) data);
+    double eigenvalues[3];
+    double res[3]{1, 2, -1};
+    Matrix<double> eigvecs(3, 3);
+    a.eig(eigenvalues, eigvecs);
+    cout << eigvecs << endl;
+    ASSERT_EQ(eigenvalues[0], res[0]);
+    ASSERT_EQ(eigenvalues[1], res[1]);
+    ASSERT_EQ(eigenvalues[2], res[2]);
+}
+
+TEST(TestSuite5, trace) {
+    int data[2][2]{{1,  2},
+                   {-1, -3}};
+    Matrix<int> a(2, 2, (void*)data);
+    ASSERT_EQ(a.trace(), -2);
+}
+
+TEST(TestSuite5, determinant) {
+    int data[2][2]{{1,  2},
+                   {-1, -3}};
+    Matrix<int> a(2, 2, (void*)data);
+    ASSERT_EQ(a.determinant(), -1);
+}
+
+TEST(TestSuite5, company_matrix) {
+    int data[2][2]{{1,  2},
+                   {-1, -3}};
+    Matrix<int> a(2, 2, (void*)data);
+    int res_d[2][2]{{-3,  -2},
+                    {1, 1}};
+    Matrix<int> res(2, 2, (void*)res_d);
+    ASSERT_TRUE(res.equals(a.company_matrix()));
+}
 
 int main(int argc, char **argv)
 {

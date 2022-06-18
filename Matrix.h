@@ -60,8 +60,8 @@ public:
     T trace();
 
     //determinant
-    Matrix<T> company_matrix();
-    T determinant();
+    Matrix<T> company_matrix() const;
+    T determinant() const;
 
     Matrix<T> reshape(size_t row, size_t col);
 
@@ -148,9 +148,6 @@ Matrix<T>::Matrix(size_t rows, size_t cols, void* d) {
 //copy constructor
 template <class T>
 Matrix<T>::Matrix(const Matrix& m) {
-    if (m.rows_num != rows_num || m.cols_num != cols_num) {
-        throw InvalidSizeException(rows_num, cols_num, m.rows_num, m.cols_num);
-    }
     rows_num = m.rows_num;
     cols_num = m.cols_num;
     data = new T[rows_num * cols_num];
@@ -203,16 +200,16 @@ template <class T>
 T Matrix<T>::max(size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
     if (start_row > end_row || start_col > end_col) throw InvalidParameterException();
     try {
-        T max = get(start_row, start_col);
+        T res = get(start_row, start_col);
         for (size_t i = start_row; i <= end_row; i++) {
             for (size_t j = start_col; j <= end_col; j++) {
-                get(i, j) > max ? max = get(i, j) : max;
+                get(i, j) > res ? res = get(i, j) : res;
             }
         }
+        return res;
     } catch (MatrixOutOfBoundException& e) {
         throw e;
     }
-    return max;
 }
 template <class T>
 T Matrix<T>::max() {
@@ -246,10 +243,10 @@ T Matrix<T>::min(size_t start_row, size_t end_row, size_t start_col, size_t end_
                 get(i, j) < min ? min = get(i, j) : min;
             }
         }
+        return min;
     } catch (MatrixOutOfBoundException& e) {
         throw e;
     }
-    return min;
 }
 template <class T>
 T Matrix<T>::min() {
@@ -283,10 +280,10 @@ T Matrix<T>::sum(size_t start_row, size_t end_row, size_t start_col, size_t end_
                 sum = sum + get(i, j);
             }
         }
+        return sum;
     } catch (MatrixOutOfBoundException& e) {
         throw e;
     }
-    return sum;
 }
 template <class T>
 T Matrix<T>::sum() {
@@ -365,10 +362,10 @@ void QR(Matrix<T>& A, Matrix<T>& Q, Matrix<T>& R) {
                 b[l] -= R.get(k, j) * Q.get(l, k);
             }
         }
-        T norm = norm(b, n);
-        R.set(j, j, norm);
+        T norm2 = norm(b, n);
+        R.set(j, j, norm2);
         for (int i = 0; i < n; ++i) {
-            Q.set(i, j, b[i] / norm);
+            Q.set(i, j, b[i] / norm2);
         }
     }
 }
@@ -378,7 +375,7 @@ void Matrix<T>::eig(T* eigen_values, Matrix<T>& eigen_vectors) {
     try {
         size_t n = rows_num;
         Matrix<T> Q(n, n), R(n, n), temp = *this;
-        size_t iter_num = n;
+        size_t iter_num = 300;
         for (int i = 0; i < iter_num; ++i) {
             QR(temp, Q, R);
             temp = R * Q;
@@ -386,7 +383,7 @@ void Matrix<T>::eig(T* eigen_values, Matrix<T>& eigen_vectors) {
         for (int i = 0; i < n; ++i) {
             eigen_values[i] = temp.get(i, i);
         }
-        eigen_vectors = Q;
+        eigen_vectors = R;
     } catch (InvalidSizeException& e) {
         throw e;
     }
@@ -405,7 +402,7 @@ T Matrix<T>::trace() {
 }
 
 template <class T>
-Matrix<T> Matrix<T>::company_matrix() {
+Matrix<T> Matrix<T>::company_matrix() const {
     size_t size = rows_num;
     Matrix<T> result(size, size);
     for (size_t i = 0; i < size; ++i) {
@@ -413,7 +410,7 @@ Matrix<T> Matrix<T>::company_matrix() {
             Matrix<T> temp(size - 1, size - 1);
             for (size_t k = 0; k < size - 1; ++k) {
                 for (size_t l = 0; l < size - 1; ++l) {
-                    temp.set(i, j, get(k < i ? k : k + 1, l < j ? l : l + 1));
+                    temp.set(k, l, get(k < i ? k : k + 1, l < j ? l : l + 1));
                 }
             }
             result.set(i, j, temp.determinant() * ((i + j) % 2 ? -1 : 1));
@@ -424,22 +421,20 @@ Matrix<T> Matrix<T>::company_matrix() {
 
 //determinant
 template <class T>
-T Matrix<T>::determinant() {
+T Matrix<T>::determinant() const {
     if (rows_num != cols_num) throw NotASquareMatrixException();
     size_t size = rows_num;
     if (size == 1) return get(0, 0);
     T res = 0;
-    for (size_t i = 0; i < size; ++i) {
-        for (size_t j = 0; j < size; ++j) {
-            if (get(i, j)) {
-                Matrix<T> temp(size - 1, size - 1);
-                for (size_t k = 0; k < size - 1; ++k) {
-                    for (size_t l = 0; l < size - 1; ++l) {
-                        temp.set(i, j, get(k < i ? k : k + 1, l < j ? l : l + 1));
-                    }
+    for (size_t j = 0; j < size; ++j) {
+        if (get(0, j)) {
+            Matrix<T> temp(size - 1, size - 1);
+            for (size_t k = 0; k < size - 1; ++k) {
+                for (size_t l = 0; l < size - 1; ++l) {
+                    temp.set(k, l, get(k < 0 ? k : k + 1, l < j ? l : l + 1));
                 }
-                res = res + get(i, j) * temp.determinant() * ((i + j) % 2 ? -1 : 1);
             }
+            res = res + get(0, j) * temp.determinant() * ((0 + j) % 2 ? -1 : 1);
         }
     }
     return res;
@@ -616,7 +611,7 @@ Matrix< std::complex<T> > conjugate(const Matrix< std::complex<T> > &m) {
 //dot product
 template <class T>
 T dot(const Matrix<T> &v1, const Matrix<T> &v2) {
-    if (v1.cols_num != v2.cols_num) throw OperandsSizeIncompatibleException();
+    if (v1.cols_num != v2.cols_num || v1.rows_num != 1 || v2.rows_num != 1) throw OperandsSizeIncompatibleException();
     size_t dimension = v1.cols_num;
     T res = 0;
     for (size_t i = 0; i < dimension; ++i) {
@@ -628,7 +623,7 @@ T dot(const Matrix<T> &v1, const Matrix<T> &v2) {
 //cross product
 template <class T>
 Matrix<T> cross(const Matrix<T> &v1, const Matrix<T> &v2) {
-    if (v1.cols_num != 3 || v2.cols_num != 3) throw InvalidParameterException();
+    if (v1.cols_num != 3 || v2.cols_num != 3 || v1.rows_num != 1 || v2.rows_num != 1) throw InvalidParameterException();
     Matrix<T> res(1, 3);
     res.set(0, 0, v1.get(0, 1) * v2.get(0, 2) - v2.get(0, 1) * v1.get(0, 2));
     res.set(0, 1, v1.get(0, 2) * v2.get(0, 0) - v2.get(0, 2) * v1.get(0, 0));
