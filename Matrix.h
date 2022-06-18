@@ -1,8 +1,6 @@
 /**
  * @mainpage Matrix Library Documentation
- * @authors
- * 12011319 陈言麒
- * 12012213 陈言麟
+ * @authors 12011319 陈言麒 12012213 陈言麟
  */
 #ifndef C___PROJECT_MATRIX_H
 #define C___PROJECT_MATRIX_H
@@ -21,13 +19,7 @@
 template<class T>
 class Matrix {
 public:
-    /**
-     * Size of the matrix.
-     */
     size_t rows_num, cols_num;
-    /**
-     * Data in the matrix.
-     */
     T *data;
 
     /**
@@ -39,32 +31,24 @@ public:
     /**
      * Create a matrix with given row number and column number, and initialize all data to default value.
      * @brief Constructor
-     * @param rows
-     * @param cols
      */
     Matrix(size_t rows, size_t cols);
 
     /**
      * Create a matrix with given row number and column number, and set all data according to the given pointer to data.
      * @brief Constructor
-     * @param rows
-     * @param cols
-     * @param d
      */
     Matrix(size_t rows, size_t cols, void *d);
 
     /**
      * Create a matrix by another matrix.
      * @brief Copy constructor
-     * @param m
      */
     Matrix(const Matrix &m);
 
     /**
      * Assign a matrix to another matrix.
      * @brief Copy assignment operator
-     * @param m
-     * @return
      */
     Matrix &operator=(const Matrix &m);
 
@@ -75,23 +59,16 @@ public:
 
     /**
      * @brief Get the value by row number and column number, indexes starting from 0.
-     * @param row
-     * @param col
-     * @return A value in the matrix.
      */
     T get(size_t row, size_t col) const;
 
     /**
      * @brief Set the value by row number and column number, indexes starting from 0.
-     * @param row
-     * @param col
-     * @param val
      */
     void set(size_t row, size_t col, T val);
 
     /**
      * @brief Find the maximum value in the whole matrix.
-     * @return The maximum value.
      */
     T max();
 
@@ -101,7 +78,6 @@ public:
      * @param end_row The ending row number of the area.
      * @param start_col The starting column number of the area.
      * @param end_col The ending column number of the area.
-     * @return The maximum value.
      */
     T max(size_t start_row, size_t end_row, size_t start_col, size_t end_col);
 
@@ -109,7 +85,6 @@ public:
      * @brief Find the maximum value in a specific row or column.
      * @param index The index of the row or column.
      * @param dir Specifies row or column, 0 for row, column otherwise.
-     * @return The maximum value.
      */
     T max(size_t index, size_t dir);
 
@@ -130,25 +105,16 @@ public:
 
     /**
      * @brief The sum of all values in the matrix.
-     * @return The sum.
      */
     T sum();
 
     /**
      * @brief The sum of values in a specific area.
-     * @param start_row
-     * @param end_row
-     * @param start_col
-     * @param end_col
-     * @return The sum.
      */
     T sum(size_t start_row, size_t end_row, size_t start_col, size_t end_col);
 
     /**
      * @brief The sum of values in a row or column.
-     * @param index
-     * @param dir
-     * @return The sum.
      */
     T sum(size_t index, size_t dir);
 
@@ -159,17 +125,11 @@ public:
 
     /**
      * @brief The average value in a specific area.
-     * @param start_row
-     * @param end_row
-     * @param start_col
-     * @param end_col
      */
     T avg(size_t start_row, size_t end_row, size_t start_col, size_t end_col);
 
     /**
      * @brief The average value in a row or column.
-     * @param index
-     * @param dir
      */
     T avg(size_t index, size_t dir);
 
@@ -183,19 +143,16 @@ public:
 
     /**
      * @brief Find the trace of the matrix.
-     * @return The trace.
      */
     T trace();
 
     /**
      * @brief Find the company matrix of the matrix.
-     * @return The company matrix.
      */
     Matrix<T> company_matrix() const;
 
     /**
      * @brief Find the determinant of the matrix.
-     * @return The determinant.
      */
     T determinant() const;
 
@@ -203,7 +160,6 @@ public:
      * @brief Reshape the matrix.
      * @param row The row number of the reshaped matrix.
      * @param col The column number of the reshaped matrix.
-     * @return The reshaped matrix.
      * @throws InvalidSizeException If the number of values in the reshaped matrix is not equal to that of the original matrix.
      */
     Matrix<T> reshape(size_t row, size_t col);
@@ -214,7 +170,6 @@ public:
      * @param row_end The ending row number of the sliced matrix.
      * @param col_start The starting column number of the sliced matrix.
      * @param col_end The ending column number of the sliced matrix.
-     * @return The sliced matrix.
      * @throws MatrixOutOfBoundException
      */
     Matrix<T> slice(size_t row_start, size_t row_end, size_t col_start, size_t col_end);
@@ -232,73 +187,95 @@ public:
 };
 
 /**
- * @brief Override the + operator for matrix addition.
+ * @brief Matrix addition.
  */
 template<class T>
 Matrix<T> operator+(const Matrix<T> &m1, const Matrix<T> &m2);
 
 /**
- * @brief Override the - operator for matrix substraction.
+ * @brief Matrix substraction.
  */
 template<class T>
 Matrix<T> operator-(const Matrix<T> &m1, const Matrix<T> &m2);
 
 /**
- * @brief Override the * operator for scalar multiplication with .
+ * @brief Scalar multiplication with constant on the right side.
  */
 template<class T>
 Matrix<T> operator*(const Matrix<T> &m1, T c);
 
 /**
- * @brief Override the * operator for scalar multiplication.
+ * @brief Scalar multiplication with constant on the left side.
  */
 template<class T>
 Matrix<T> operator*(T c, const Matrix<T> &m2);
 
-//matrix multiplication
+/**
+ * @brief Matrix multiplication.
+ */
 template<class T>
 Matrix<T> operator*(const Matrix<T> &m1, const Matrix<T> &m2);
 
-//element-wise multiplication
+/**
+ * @brief Element wise multiplication.
+ */
 template<class T>
 Matrix<T> element_wise_multiplication(const Matrix<T> &m1, const Matrix<T> &m2);
 
-//scalar division
+/**
+ * @brief Scalar division.
+ */
 template<class T>
 Matrix<T> operator/(const Matrix<T> &m1, T c);
 
-//transposition
+/**
+ * @brief Matrix transposition.
+ */
 template<class T>
 Matrix<T> transpose(const Matrix<T> &m);
 
-//conjugation
+/**
+ * @brief Return the conjugate matrix.
+ */
 template<class T>
 Matrix<std::complex<T> > conjugate(const Matrix<std::complex<T> > &m);
 
-//dot product
+/**
+ * @brief Dot product of two vectors.
+ */
 template<class T>
 T dot(const Matrix<T> &v1, const Matrix<T> &v2);
 
-//cross product
+/**
+ * @brief Cross product of two vectors, only for 3-dimension vector.
+ * @throws InvalidParameterException If the vector is not 3-dimension.
+ */
 template<class T>
 Matrix<T> cross(const Matrix<T> &v1, const Matrix<T> &v2);
 
-//inverse
+/**
+ * @brief The inverse of the matrix.
+ * @throws NotInvertibleException If the determinant of the matrix is 0.
+ */
 template<class T>
 Matrix<T> inverse(const Matrix<T> &m);
 
-//convolution
+/**
+ * @brief The convolution of two matrices.
+ */
 template<class T>
 Matrix<T> conv(const Matrix<T> &m1, const Matrix<T> &m2);
 
-//convert from opencv::Mat, we only implement the double type
+/**
+ * @brief Convert from opencv::Mat, only implemented the double type.
+ */
 Matrix<double> fromCV(cv::Mat &m);
 
-//convert to opencv::Mat, we only implement the double type
+/**
+ * @brief Convert to opencv::Mat, only implemented the double type
+ */
 cv::Mat toCV(Matrix<double> &m);
 
-/*naive version, no shared memory, all hard copy*/
-//constructors
 template<class T>
 Matrix<T>::Matrix(size_t rows, size_t cols) {
     rows_num = rows;
@@ -766,6 +743,7 @@ Matrix<T> cross(const Matrix<T> &v1, const Matrix<T> &v2) {
 //inverse
 template<class T>
 Matrix<T> inverse(const Matrix<T> &m) {
+    if (m.determinant() == 0) throw NotInvertibleException();
     return m.company_matrix() / m.determinant();
 }
 

@@ -307,6 +307,12 @@ TEST(ExceptionTest, OperandsSizeIncompatibleException){
     ASSERT_THROW(dot(m1,m2), OperandsSizeIncompatibleException);
 }
 
+TEST(ExceptionTest, NotInvertibleException){
+    int data[2][2]{{0,0},{1,1}};
+    Matrix<int> m(2,2,(void*)data);
+    ASSERT_THROW(inverse(m), NotInvertibleException);
+}
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);

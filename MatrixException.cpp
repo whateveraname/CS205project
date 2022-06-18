@@ -51,3 +51,10 @@ public:
         return "The operands of the operator are incompatible";
     }
 };
+
+class NotInvertibleException : public MatrixException {
+public:
+    const char *what() const throw() {
+        return "The matrix is not invertible.";
+    }
+};
