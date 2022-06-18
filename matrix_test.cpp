@@ -46,7 +46,6 @@ TEST(ArithmeticTest, addition) {
     int res_d[2][2]{{6, 8}, {10, 12}};
     Matrix<int> res(2, 2, (void*)res_d);
     ASSERT_TRUE(res.equals(a + b));
-    //
 }
 
 TEST(ArithmeticTest, subtraction) {
@@ -165,6 +164,7 @@ TEST(ReductionTest, sum) {
     ASSERT_EQ(a.sum(), 10);
     ASSERT_EQ(a.sum(0, 0, 0, 1), 3);
     ASSERT_EQ(a.sum(1, 1), 6);
+
 }
 
 TEST(ReductionTest, avg) {
@@ -186,9 +186,9 @@ TEST(TestSuite5, eig) {
     Matrix<double> eigvecs(3, 3);
     a.eig(eigenvalues, eigvecs);
     cout << eigvecs << endl;
-    ASSERT_EQ(eigenvalues[0], res[0]);
-    ASSERT_EQ(eigenvalues[1], res[1]);
-    ASSERT_EQ(eigenvalues[2], res[2]);
+    ASSERT_DOUBLE_EQ(eigenvalues[0], res[0]);
+    ASSERT_DOUBLE_EQ(eigenvalues[1], res[1]);
+    ASSERT_DOUBLE_EQ(eigenvalues[2], res[2]);
 }
 
 TEST(TestSuite5, trace) {
@@ -222,8 +222,6 @@ TEST(SliceTest, SliceTest){
     Matrix<int> s1(2,2,(void*)sd1);
     int sd2[3][3]{{2,3,4},{6,7,8},{10,11,12}};
     Matrix<int> s2(3,3,(void*)sd2);
-    cout << m.slice(0,1,0,1);
-    cout << m.slice(0,2,1,3);
     ASSERT_TRUE(s1.equals(m.slice(0,1,0,1)));
     ASSERT_TRUE(s2.equals(m.slice(0,2,1,3)));
 }
@@ -261,6 +259,52 @@ TEST(ConvolutionTest, ConvolutionTest){
     Matrix<int> res2(4,7,(void*)resd2);
     ASSERT_TRUE(res1.equals(conv(m1,m1)));
     ASSERT_TRUE(res2.equals(conv(m2,m1)));
+}
+
+TEST(ExceptionTest, InvalidSizeException){
+    int data[3][4]{{1,2,3,4}, {5,6,7,8}, {9,10,11,12}};
+    Matrix<int> m(3,4,(void*)data);
+    ASSERT_THROW(m.reshape(2,5), InvalidSizeException);
+}
+
+TEST(ExceptionTest, MatrixOutOfBoundException){
+    int data[2][2]{{1,2},{3,4}};
+    Matrix<int> m(2,2,(void*)data);
+    ASSERT_THROW(m.get(-1,-1), MatrixOutOfBoundException);
+    ASSERT_THROW(m.set(1,2,1), MatrixOutOfBoundException);
+    ASSERT_THROW(m.slice(-1,2,0,1), MatrixOutOfBoundException);
+}
+
+TEST(ExceptionTest, InvalidParameterException){
+    int data[2][2]{{1,2},{3,4}};
+    Matrix<int> m(2,2,(void*)data);
+    ASSERT_THROW(m.max(1,0,1,0), InvalidParameterException);
+    ASSERT_THROW(m.min(1,0,1,0), InvalidParameterException);
+    ASSERT_THROW(m.sum(1,0,1,0), InvalidParameterException);
+    ASSERT_THROW(m.slice(1,0,1,0), InvalidParameterException);
+    ASSERT_THROW(cross(m, m), InvalidParameterException);
+}
+
+TEST(ExceptionTest, NotASquareMatrixException){
+    int data[1][2]{{1,2}};
+    Matrix<int> m(1,2,(void*)data);
+    int eigen_value;
+    Matrix<int> eigen_vector;
+    ASSERT_THROW(m.eig(&eigen_value, eigen_vector), NotASquareMatrixException);
+    ASSERT_THROW(m.trace(), NotASquareMatrixException);
+    ASSERT_THROW(m.determinant(), NotASquareMatrixException);
+}
+
+TEST(ExceptionTest, OperandsSizeIncompatibleException){
+    int data1[1][3]{{1,2,3}};
+    Matrix<int> m1(2,2,(void*)data1);
+    int data2[2][1]{{1},{2}};
+    Matrix<int> m2(1,2,(void*)data2);
+    ASSERT_THROW(m1+m2, OperandsSizeIncompatibleException);
+    ASSERT_THROW(m1-m2, OperandsSizeIncompatibleException);
+    ASSERT_THROW(m1*m2, OperandsSizeIncompatibleException);
+    ASSERT_THROW(element_wise_multiplication(m1,m2), OperandsSizeIncompatibleException);
+    ASSERT_THROW(dot(m1,m2), OperandsSizeIncompatibleException);
 }
 
 int main(int argc, char **argv)
