@@ -46,6 +46,7 @@ TEST(ArithmeticTest, addition) {
     int res_d[2][2]{{6, 8}, {10, 12}};
     Matrix<int> res(2, 2, (void*)res_d);
     ASSERT_TRUE(res.equals(a + b));
+    //
 }
 
 TEST(ArithmeticTest, subtraction) {
