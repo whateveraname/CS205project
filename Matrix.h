@@ -12,6 +12,9 @@
 #include <memory.h>
 #include "MatrixException.cpp"
 
+template <class T>
+class SparseMatrix;
+
 /**
  * @brief Matrix class supporting all standard numeric types and custom numeric types.
  * @tparam T
@@ -184,6 +187,32 @@ public:
      * @brief Determine whether the row number, column number and all values of two matrices are exactly the same.
      */
     bool equals(const Matrix<T> &m);
+
+
+    /**
+     * @brief convert from dense matrix to sparse matrix
+     */
+    SparseMatrix<T> toSparse();
+};
+
+template<class T>
+class SparseMatrix {
+public:
+    size_t rows_num;
+    size_t cols_num;
+    std::vector<T[3]> data;
+
+    SparseMatrix(size_t rows, size_t cols) {
+        rows_num = rows;
+        cols_num = cols;
+    }
+
+    Matrix<T> toDense() {
+        Matrix<T> m(rows_num, cols_num);
+        for (int i = 0; i < data.size(); ++i) {
+            m.set(data[i][0], data[i][1], data[i][2]);
+        }
+    }
 };
 
 /**
@@ -599,6 +628,19 @@ bool Matrix<T>::equals(const Matrix<T> &m) {
         }
     }
     return true;
+}
+
+template<class T>
+SparseMatrix<T> Matrix<T>::toSparse() {
+    SparseMatrix<T> m(rows_num, cols_num);
+    for (int i = 0; i < rows_num; ++i) {
+        for (int j = 0; j < cols_num; ++j) {
+            if (get(i, j)) {
+                m.data.pushback({i, j, get(i, j)});
+            }
+        }
+    }
+    return m;
 }
 
 //matrix addition
