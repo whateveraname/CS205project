@@ -62,63 +62,123 @@ public:
 
     /**
      * Assign a matrix to another matrix.
+     * @brief Copy assignment operator
      * @param m
      * @return
      */
     Matrix &operator=(const Matrix &m);
 
-    //destructor
+    /**
+     * @brief Destructor
+     */
     ~Matrix();
 
-    //getter
+    /**
+     * @brief Get the value by row number and column number, indexes starting from 0.
+     * @param row
+     * @param col
+     * @return A value in the matrix.
+     */
     T get(size_t row, size_t col) const;
 
-    //setter
+    /**
+     * @brief Set the value by row number and column number, indexes starting from 0.
+     * @param row
+     * @param col
+     * @param val
+     */
     void set(size_t row, size_t col, T val);
 
-    //finding maximum
+    /**
+     * @brief Find the maximum value in the whole matrix.
+     * @return The maximum value.
+     */
     T max();
 
     /**
-     *
-     * @param start_row
-     * @param end_row
-     * @param start_col
-     * @param end_col
-     * @return
+     * @brief Find the maximum value in a specific area.
+     * @param start_row The starting row number of the area.
+     * @param end_row The ending row number of the area.
+     * @param start_col The starting column number of the area.
+     * @param end_col The ending column number of the area.
+     * @return The maximum value.
      */
     T max(size_t start_row, size_t end_row, size_t start_col, size_t end_col);
 
     /**
-     *
-     * @param index
-     * @param dir
-     * @return
+     * @brief Find the maximum value in a specific row or column.
+     * @param index The index of the row or column.
+     * @param dir Specifies row or column, 0 for row, column otherwise.
+     * @return The maximum value.
      */
     T max(size_t index, size_t dir);
 
-    //finding minimum
+    /**
+     * @see max()
+     */
     T min();
 
+    /**
+     * @see max(size_t start_row, size_t end_row, size_t start_col, size_t end_col)
+     */
     T min(size_t start_row, size_t end_row, size_t start_col, size_t end_col);
 
+    /**
+     * @see max(size_t index, size_t dir)
+     */
     T min(size_t index, size_t dir);
 
-    //summing
+    /**
+     * @brief The sum of all values in the matrix.
+     * @return The sum.
+     */
     T sum();
 
+    /**
+     * @brief The sum of values in a specific area.
+     * @param start_row
+     * @param end_row
+     * @param start_col
+     * @param end_col
+     * @return The sum.
+     */
     T sum(size_t start_row, size_t end_row, size_t start_col, size_t end_col);
 
+    /**
+     * @brief The sum of values in a row or column.
+     * @param index
+     * @param dir
+     * @return The sum.
+     */
     T sum(size_t index, size_t dir);
 
-    //averaging
+    /**
+     * @brief The average value of all values in the matrix
+     */
     T avg();
 
+    /**
+     * @brief The average value in a specific area.
+     * @param start_row
+     * @param end_row
+     * @param start_col
+     * @param end_col
+     */
     T avg(size_t start_row, size_t end_row, size_t start_col, size_t end_col);
 
+    /**
+     * @brief The average value in a row or column.
+     * @param index
+     * @param dir
+     */
     T avg(size_t index, size_t dir);
 
-    //eigenvalues eigenvectors
+    /**
+     * @brief Find the eigen value and the eigen vector of the matrix.
+     * @param eigen_values An array to store the eigen values.
+     * @param eigen_vectors An n * n matrix to store the eigen vectors, each column stores an eigen vector.
+     * @throws
+     */
     void eig(T *eigen_values, Matrix<T> &eigen_vectors);
 
     //traces
@@ -203,6 +263,7 @@ Matrix<T>::Matrix(size_t rows, size_t cols) {
     rows_num = rows;
     cols_num = cols;
     data = new T[rows_num * cols_num];
+    memset(data, 0, rows_num * cols_num);
 }
 
 template<class T>
@@ -281,8 +342,12 @@ T Matrix<T>::max() {
 template<class T>
 T Matrix<T>::max(size_t index, size_t dir) { //if dir = 0, row-specific; else col-specific
     if (dir) {
+        if (index < 0) throw MatrixOutOfBoundException(0, index);
+        else if (index >= cols_num) throw MatrixOutOfBoundException(cols_num - 1, index);
         return max(0, rows_num - 1, index, index);
     } else {
+        if (index < 0) throw MatrixOutOfBoundException(0, index);
+        else if (index >= rows_num) throw MatrixOutOfBoundException(rows_num - 1, index);
         return max(index, index, 0, cols_num - 1);
     }
 }
