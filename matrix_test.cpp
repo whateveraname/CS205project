@@ -177,12 +177,12 @@ TEST(ReductionTest, avg) {
 }
 
 TEST(TestSuite5, eig) {
-    double data[3][3]{{1, 0,  2},
-                      {0, -1, 0},
-                      {0, 4,  2}};
+    double data[3][3]{{13, 14, 4},
+                      {14, 24, 18},
+                      {4, 18, 29}};
     Matrix<double> a(3, 3, (void *) data);
     double eigenvalues[3];
-    double res[3]{1, 2, -1};
+    double res[3]{49, 16, 1};
     Matrix<double> eigvecs(3, 3);
     a.eig(eigenvalues, eigvecs);
     cout << eigvecs << endl;

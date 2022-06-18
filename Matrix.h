@@ -466,15 +466,18 @@ void Matrix<T>::eig(T *eigen_values, Matrix<T> &eigen_vectors) {
     if (rows_num != cols_num) throw NotASquareMatrixException();
     size_t n = rows_num;
     Matrix<T> Q(n, n), R(n, n), temp = *this;
-    size_t iter_num = 300;
+    for (int i = 0; i < n; ++i) {
+        eigen_vectors.set(i, i, 1);
+    }
+    size_t iter_num = 100;
     for (int i = 0; i < iter_num; ++i) {
         QR(temp, Q, R);
+        eigen_vectors = eigen_vectors * Q;
         temp = R * Q;
     }
     for (int i = 0; i < n; ++i) {
         eigen_values[i] = temp.get(i, i);
     }
-    eigen_vectors = R;
 }
 
 //traces
