@@ -263,7 +263,7 @@ Matrix<T>::Matrix(size_t rows, size_t cols) {
     rows_num = rows;
     cols_num = cols;
     data = new T[rows_num * cols_num];
-    memset(data, 0, rows_num * cols_num);
+    memset(data, 0, rows_num * cols_num * sizeof(T));
 }
 
 template<class T>
