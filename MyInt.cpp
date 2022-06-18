@@ -1,65 +1,49 @@
 #include "MyInt.h"
 
-MyInt MyInt::operator+(MyInt &rhs) {
+MyInt MyInt::operator+(const MyInt& rhs) const {
     return {data + rhs.data};
 }
 
-MyInt MyInt::operator-(MyInt &rhs) {
+MyInt MyInt::operator-(const MyInt& rhs) const {
     return {data - rhs.data};
 }
 
-MyInt MyInt::operator/(MyInt &rhs) {
+MyInt MyInt::operator/(const MyInt& rhs) const {
     return {data / rhs.data};
 }
 
-MyInt MyInt::operator*(MyInt &rhs) {
+MyInt MyInt::operator*(const MyInt& rhs) const{
     return {data * rhs.data};
 }
 
-MyInt MyInt::operator+(int rhs) {
+MyInt MyInt::operator+(int rhs) const {
     return {data + rhs};
 }
 
-MyInt MyInt::operator-(int rhs) {
+MyInt MyInt::operator-(int rhs) const {
     return {data - rhs};
 }
 
-MyInt MyInt::operator*(int rhs) {
+MyInt MyInt::operator*(int rhs) const {
     return {data * rhs};
 }
 
-MyInt MyInt::operator/(int rhs) {
+MyInt MyInt::operator/(int rhs) const {
     return {data / rhs};
 }
 
-MyInt operator+(MyInt &lhs, MyInt &rhs) {
-    return {lhs.data + rhs.data};
-}
-
-MyInt operator-(MyInt &lhs, MyInt &rhs) {
-    return {lhs.data - rhs.data};
-}
-
-MyInt operator*(MyInt &lhs, MyInt &rhs) {
-    return {lhs.data * rhs.data};
-}
-
-MyInt operator/(MyInt &lhs, MyInt &rhs) {
-    return {lhs.data / rhs .data};
-}
-
-MyInt operator+(int lhs, MyInt &rhs) {
+MyInt operator+(int lhs, const MyInt& rhs) {
     return rhs + lhs;
 }
 
-MyInt operator-(int lhs, MyInt &rhs) {
+MyInt operator-(int lhs, const MyInt& rhs) {
     return rhs - lhs;
 }
 
-MyInt operator*(int lhs, MyInt &rhs) {
+MyInt operator*(int lhs, const MyInt& rhs) {
     return rhs * lhs;
 }
 
-MyInt operator/(int lhs, MyInt &rhs) {
+MyInt operator/(int lhs, const MyInt& rhs) {
     return rhs / lhs;
 }

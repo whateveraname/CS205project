@@ -461,7 +461,7 @@ Matrix<T> Matrix<T>::slice(size_t row_start, size_t row_end, size_t col_start, s
     size_t cols = col_end - col_start + 1;
     T* d = new T[rows * cols];
     for(size_t i = row_start; i <= row_end; i++){
-        memcpy(d + i * cols, data + i * cols_num + row_start, cols * sizeof(T));
+        memcpy(d + i * cols, data + i * cols_num + col_start, cols * sizeof(T));
     }
     Matrix<T> result(rows, cols, (void *)d);
     delete[] d;
@@ -470,15 +470,13 @@ Matrix<T> Matrix<T>::slice(size_t row_start, size_t row_end, size_t col_start, s
 
 template<class T>
 std::ostream &operator<<(std::ostream &os, Matrix<T> m) {
-    os << "[";
     for (size_t i = 0; i < m.rows_num; i++){
         os << "[";
         for (size_t j = 0; j < m.cols_num - 1; j++){
-            os << m.get(i, j) << ",\t";
+            os << m.get(i, j) << ", ";
         }
-        os << m.get(i, m.cols_num - 1) << "]";
+        os << m.get(i, m.cols_num - 1) << "]\n";
     }
-    os << "]\n";
     return os;
 }
 

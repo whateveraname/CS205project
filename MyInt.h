@@ -4,27 +4,32 @@
 
 class MyInt{
 public:
+    MyInt():data(0){}
+
     size_t data;
     MyInt(size_t d):data(d){}
-    MyInt operator+(MyInt& rhs);
-    MyInt operator-(MyInt& rhs);
-    MyInt operator*(MyInt& rhs);
-    MyInt operator/(MyInt& rhs);
+    MyInt operator+(const MyInt& rhs) const;
+    MyInt operator-(const MyInt& rhs) const;
+    MyInt operator*(const MyInt& rhs) const;
+    MyInt operator/(const MyInt& rhs) const;
 
-    MyInt operator+(int rhs);
-    MyInt operator-(int rhs);
-    MyInt operator*(int rhs);
-    MyInt operator/(int rhs);
+    MyInt operator+(int rhs) const;
+    MyInt operator-(int rhs) const;
+    MyInt operator*(int rhs) const;
+    MyInt operator/(int rhs) const;
 
-    friend MyInt operator+(MyInt& lhs, MyInt& rhs);
-    friend MyInt operator-(MyInt& lhs, MyInt& rhs);
-    friend MyInt operator*(MyInt& lhs, MyInt& rhs);
-    friend MyInt operator/(MyInt& lhs, MyInt& rhs);
-
-    friend MyInt operator+(int lhs, MyInt& rhs);
-    friend MyInt operator-(int lhs, MyInt& rhs);
-    friend MyInt operator*(int lhs, MyInt& rhs);
-    friend MyInt operator/(int lhs, MyInt& rhs);
+    friend MyInt operator+(int lhs, const MyInt& rhs);
+    friend MyInt operator-(int lhs, const MyInt& rhs);
+    friend MyInt operator*(int lhs, const MyInt& rhs);
+    friend MyInt operator/(int lhs, const MyInt& rhs);
+    
+    bool operator==(const MyInt& rhs) const{
+        return data==rhs.data;
+    }
+    
+    bool operator!=(const MyInt& rhs) const{
+        return data!=rhs.data;
+    }
 };
 
 
